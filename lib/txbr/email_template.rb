@@ -13,9 +13,11 @@ module Txbr
     def each_resource
       return to_enum(__method__) unless block_given?
 
-      connected_content_prefixes.each do |prefix|
-        resource_slug = Txgh::Utils.slugify("#{template_name}-#{prefix}")
-        phrases = strings.each_string(prefix).to_a
+      strings.prefixes.each do |prefix|
+        resource_slug = Txgh::Utils.slugify("#{email_template_id}-#{prefix}")
+        phrases = strings.each_string(prefix).map do |path, value|
+          { 'key' => path.join('.'), 'string' => value }
+        end
 
         resource = Txgh::TxResource.new(
           project.project_slug,
@@ -31,9 +33,53 @@ module Txbr
       end
     end
 
+    private
+
+    def strings
+      @strings ||= components.inject(StringsManifest.new) do |manifest, component|
+        manifest.merge(component.strings)
+      end
+    end
+
+    def components
+      @components ||= %w(body subject preheader).map do |name|
+        EmailTemplateComponent.new(
+          Liquid::Template.parse(contents[name])
+        )
+      end
+    end
+
+    def template_name
+      contents['name']
+    end
+
+    # @TODO this won't work until Braze implements the endpoint(s)
+    # we've asked for.
+    def contents
+      {
+        'body' => File.read('liquid_body.html'),
+        'subject' => File.read('liquid_subject.html'),
+        'preheader' => File.read('liquid_preheader.html'),
+        'name' => 'ToT Insight'
+      }
+
+      # @contents ||= project.braze_api.get_email_template(
+      #   email_template_id: email_template_id
+      # )
+    end
+  end
+
+
+  class EmailTemplateComponent
+    attr_reader :liquid_template
+
+    def initialize(liquid_template)
+      @liquid_template = liquid_template
+    end
+
     def strings
       @strings ||= StringsManifest.new.tap do |manifest|
-        template.root.nodelist.each do |node|
+        liquid_template.root.nodelist.each do |node|
           case node
             # We only care about Liquid variables, which are written
             # like {{prefix.foo.bar}}. We identify the prefix (i.e.
@@ -66,30 +112,9 @@ module Txbr
     end
 
     def connected_content_tags
-      @connected_content_tags ||= template.root.nodelist.select do |node|
+      @connected_content_tags ||= liquid_template.root.nodelist.select do |node|
         node.is_a?(Txbr::ConnectedContentTag)
       end
-    end
-
-    def template
-      @template ||= Liquid::Template.parse(contents['html_body'])
-    end
-
-    def template_name
-      contents['name']
-    end
-
-    # @TODO this won't work until Braze implements the endpoint(s)
-    # we've asked for.
-    def contents
-      {
-        'html_body' => File.read('liquid_test.html'),
-        'name' => 'ToT Insight'
-      }
-
-      # @contents ||= project.braze_api.get_email_template(
-      #   email_template_id: email_template_id
-      # )
     end
   end
 end

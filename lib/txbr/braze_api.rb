@@ -14,10 +14,12 @@ module Txbr
       @api_url = api_url
     end
 
+    # @TODO: this is probably wrong
     def list_email_templates
       get_json('templates/email/list')
     end
 
+    # @TODO: this is probably wrong
     def get_email_template(email_template_id:)
       params = { email_template_id: email_template_id }
       get_json('templates/email/get', params)

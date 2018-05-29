@@ -25,6 +25,22 @@ module Txbr
       root[path.last] = value
     end
 
+    def merge(other_manifest)
+      self.class.new.tap do |new_manifest|
+        prefixes.each do |prefix|
+          each_string(prefix) do |path, value|
+            new_manifest.add(prefix, path, value)
+          end
+        end
+
+        other_manifest.prefixes.each do |prefix|
+          other_manifest.each_string(prefix) do |path, value|
+            new_manifest.add(prefix, path, value)
+          end
+        end
+      end
+    end
+
     def to_h
       @strings
     end
@@ -32,6 +48,10 @@ module Txbr
     def each(prefix, &block)
       return to_enum(__method__, prefix) unless block_given?
       each_helper(@strings[prefix], [], &block)
+    end
+
+    def prefixes
+      @strings.keys
     end
 
     alias each_string each
@@ -46,7 +66,7 @@ module Txbr
           end
 
         else
-          yield 'key' => path.join('.'), 'string' => root
+          yield path, root
       end
     end
   end
