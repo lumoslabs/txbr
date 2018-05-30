@@ -16,11 +16,9 @@ module Txbr
     def each_template
       return to_enum(__method__) unless block_given?
 
-      # project.braze_api.list_email_templates.each do |tmpl|
-      #   yield EmailTemplate.new(project, tmpl['email_template_id'])
-      # end
-
-      yield EmailTemplate.new(project, '123abc')
+      project.braze_api.list_email_templates['results'].each do |tmpl|
+        yield EmailTemplate.new(project, tmpl['id'])
+      end
     end
   end
 end

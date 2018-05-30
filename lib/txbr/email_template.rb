@@ -14,10 +14,14 @@ module Txbr
       return to_enum(__method__) unless block_given?
 
       strings.prefixes.each do |prefix|
-        resource_slug = Txgh::Utils.slugify("#{email_template_id}-#{prefix}")
-        phrases = strings.each_string(prefix).map do |path, value|
-          { 'key' => path.join('.'), 'string' => value }
-        end
+        resource_slug = Txgh::Utils.slugify("#{api_identifier}-#{prefix}")
+        phrases = strings.each_string(prefix)
+          .reject { |_, value| value.nil? }
+          .map do |path, value|
+            { 'key' => path.join('.'), 'string' => value }
+          end
+
+        next if phrases.empty?
 
         resource = Txgh::TxResource.new(
           project.project_slug,
@@ -42,7 +46,7 @@ module Txbr
     end
 
     def components
-      @components ||= %w(body subject preheader).map do |name|
+      @components ||= %w(template subject preheader).map do |name|
         EmailTemplateComponent.new(
           Liquid::Template.parse(contents[name])
         )
@@ -53,19 +57,24 @@ module Txbr
       contents['name']
     end
 
+    def api_identifier
+      contents['api_identifier']
+    end
+
     # @TODO this won't work until Braze implements the endpoint(s)
     # we've asked for.
     def contents
-      {
-        'body' => File.read('liquid_body.html'),
-        'subject' => File.read('liquid_subject.html'),
-        'preheader' => File.read('liquid_preheader.html'),
-        'name' => 'ToT Insight'
-      }
+      # {
+      #   'template' => File.read('liquid_body.html'),
+      #   'subject' => File.read('liquid_subject.html'),
+      #   'preheader' => File.read('liquid_preheader.html'),
+      #   'name' => 'ToT Insight',
+      #   'api_identifier' => 'abc123'
+      # }
 
-      # @contents ||= project.braze_api.get_email_template(
-      #   email_template_id: email_template_id
-      # )
+      @contents ||= project.braze_api.get_email_template(
+        email_template_id: email_template_id
+      )
     end
   end
 
