@@ -44,7 +44,7 @@ module Txbr
     def strings_map
       @strings_map ||= %w(template subject preheader).each_with_object({}) do |name, ret|
         component = EmailTemplateComponent.new(
-          Liquid::Template.parse(contents[name])
+          Liquid::Template.parse(details[name])
         )
 
         next unless component.translation_enabled?
@@ -58,11 +58,11 @@ module Txbr
     end
 
     def template_name
-      contents['name']
+      details['name']
     end
 
-    def contents
-      @contents ||= project.braze_api.get_email_template(
+    def details
+      @details ||= project.braze_api.get_email_template_details(
         email_template_id: email_template_id
       )
     end

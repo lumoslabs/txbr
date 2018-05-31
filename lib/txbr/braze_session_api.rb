@@ -3,6 +3,8 @@ require 'faraday_middleware'
 
 module Txbr
   class BrazeSessionApi
+    EMAIL_TEMPLATE_BATCH_SIZE = 35
+
     include RequestMethods
 
     attr_reader :session, :app_group_id
@@ -12,11 +14,23 @@ module Txbr
       @app_group_id = app_group_id
     end
 
-    def list_email_templates
-      get_json('engagement/email_templates', start: 0, limit: 35)
+    def each_email_template(start: 0, &block)
+      return to_enum(__method__, start: start) unless block_given?
+
+      loop do
+        templates = get_json(
+          'engagement/email_templates',
+          start: start,
+          limit: EMAIL_TEMPLATE_BATCH_SIZE
+        )
+
+        templates['results'].each(&block)
+        start += templates.size
+        break if templates.size < EMAIL_TEMPLATE_BATCH_SIZE
+      end
     end
 
-    def get_email_template(email_template_id:)
+    def get_email_template_details(email_template_id:)
       get_json("engagement/email_templates/#{email_template_id}")
     end
 

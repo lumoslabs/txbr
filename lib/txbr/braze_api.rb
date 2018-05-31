@@ -12,11 +12,11 @@ module Txbr
       @api_url = api_url
     end
 
-    def list_email_templates
+    def each_email_template
       raise NotImplementedError, 'Braze does not support this operation yet'
     end
 
-    def get_email_template(email_template_id:)
+    def get_email_template_details(email_template_id:)
       raise NotImplementedError, 'Braze does not support this operation yet'
     end
 

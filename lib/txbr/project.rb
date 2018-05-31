@@ -4,7 +4,7 @@ module Txbr
   class Project
     attr_reader :braze_api_url, :braze_api_key, :handler_id
     attr_reader :transifex_api_username, :transifex_api_password
-    attr_reader :project_slug, :strings_format, :source_lang
+    attr_reader :strings_format, :source_lang
 
     # @TODO: remove these when Braze gives us the endpoints we asked for
     attr_reader :braze_app_group_id, :braze_email_address, :braze_password
@@ -15,7 +15,6 @@ module Txbr
       @handler_id = options.fetch(:handler_id)
       @transifex_api_username = options.fetch(:transifex_api_username)
       @transifex_api_password = options.fetch(:transifex_api_password)
-      @project_slug = options.fetch(:project_slug)
       @strings_format = options.fetch(:strings_format)
       @source_lang = options.fetch(:source_lang)
 
