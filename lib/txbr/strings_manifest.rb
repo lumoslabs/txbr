@@ -27,16 +27,15 @@ module Txbr
 
     def merge(other_manifest)
       self.class.new.tap do |new_manifest|
-        prefixes.each do |prefix|
-          each_string(prefix) do |path, value|
-            new_manifest.add(prefix, path, value)
-          end
-        end
+        new_manifest.merge!(self)
+        new_manifest.merge!(other_manifest)
+      end
+    end
 
-        other_manifest.prefixes.each do |prefix|
-          other_manifest.each_string(prefix) do |path, value|
-            new_manifest.add(prefix, path, value)
-          end
+    def merge!(other_manifest)
+      other_manifest.prefixes.each do |prefix|
+        other_manifest.each_string(prefix) do |path, value|
+          add(prefix, path, value)
         end
       end
     end

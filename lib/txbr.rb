@@ -1,17 +1,18 @@
 require 'liquid'
 
 module Txbr
-  autoload :BrazeApi,             'txbr/braze_api'
-  autoload :BrazeSession,         'txbr/braze_session'
-  autoload :BrazeSessionApi,      'txbr/braze_session_api'
-  autoload :Config,               'txbr/config'
-  autoload :EmailTemplate,        'txbr/email_template'
-  autoload :EmailTemplateHandler, 'txbr/email_template_handler'
-  autoload :Project,              'txbr/project'
-  autoload :RequestMethods,       'txbr/request_methods'
-  autoload :StringsManifest,      'txbr/strings_manifest'
-  autoload :Uploader,             'txbr/uploader'
-  autoload :Utils,                'txbr/utils'
+  autoload :BrazeApi,               'txbr/braze_api'
+  autoload :BrazeSession,           'txbr/braze_session'
+  autoload :BrazeSessionApi,        'txbr/braze_session_api'
+  autoload :Config,                 'txbr/config'
+  autoload :EmailTemplate,          'txbr/email_template'
+  autoload :EmailTemplateComponent, 'txbr/email_template_component'
+  autoload :EmailTemplateHandler,   'txbr/email_template_handler'
+  autoload :Project,                'txbr/project'
+  autoload :RequestMethods,         'txbr/request_methods'
+  autoload :StringsManifest,        'txbr/strings_manifest'
+  autoload :Uploader,               'txbr/uploader'
+  autoload :Utils,                  'txbr/utils'
 
   class BrazeApiError < StandardError; end
   class BrazeUnauthorizedError < BrazeApiError; end
