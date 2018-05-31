@@ -7,7 +7,7 @@ module Txbr
     attr_reader :project_slug, :strings_format, :source_lang
 
     # @TODO: remove these when Braze gives us the endpoints we asked for
-    attr_reader :session_id, :app_group_id
+    attr_reader :braze_app_group_id, :braze_email_address, :braze_password
 
     def initialize(options = {})
       @braze_api_url = options.fetch(:braze_api_url)
@@ -20,14 +20,21 @@ module Txbr
       @source_lang = options.fetch(:source_lang)
 
       # @TODO: remove these when Braze gives us the endpoints we asked for
-      @session_id = options.fetch(:session_id)
-      @app_group_id = options.fetch(:app_group_id)
+      @braze_app_group_id = options.fetch(:braze_app_group_id)
+      @braze_email_address = options.fetch(:braze_email_address)
+      @braze_password = options.fetch(:braze_password)
+    end
+
+    def braze_session
+      @@braze_session ||= Txbr::BrazeSession.new(
+        braze_api_url, braze_email_address, braze_password
+      )
     end
 
     def braze_api
       # @TODO: use BrazeApi when Braze gives us the endpoints we asked for
       # @braze_api ||= Txbr::BrazeApi.new(braze_api_key, braze_api_url)
-      @braze_api ||= Txbr::BrazeSessionApi.new(braze_api_url, session_id, app_group_id)
+      @braze_api ||= Txbr::BrazeSessionApi.new(braze_session, braze_app_group_id)
     end
 
     def transifex_api

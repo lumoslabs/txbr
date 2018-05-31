@@ -61,17 +61,7 @@ module Txbr
       contents['api_identifier']
     end
 
-    # @TODO this won't work until Braze implements the endpoint(s)
-    # we've asked for.
     def contents
-      # {
-      #   'template' => File.read('liquid_body.html'),
-      #   'subject' => File.read('liquid_subject.html'),
-      #   'preheader' => File.read('liquid_preheader.html'),
-      #   'name' => 'ToT Insight',
-      #   'api_identifier' => 'abc123'
-      # }
-
       @contents ||= project.braze_api.get_email_template(
         email_template_id: email_template_id
       )

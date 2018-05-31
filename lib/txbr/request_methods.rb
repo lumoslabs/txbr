@@ -13,15 +13,17 @@ module Txbr
     end
 
     def get(url, params = {})
-      response = connection.get(url, params)
-      raise_error!(response)
-      response
+      act(:get, url, params)
     end
 
     def post(url, body)
-      response = connection.post(url, body)
-      raise_error!(response)
-      response
+      act(:post, url, body)
+    end
+
+    def act(verb, *args)
+      connection.send(verb, *args).tap do |response|
+        raise_error!(response)
+      end
     end
 
     def raise_error!(response)
