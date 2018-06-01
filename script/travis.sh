@@ -3,7 +3,7 @@ set -ev
 
 # args: directory, repo
 build_image() {
-  docker_repo_name=$2
+  docker_repo_name=$1
 
   docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD quay.io
   echo $TRAVIS_COMMIT > REVISION
