@@ -9,7 +9,7 @@ module Txbr
 
     attr_reader :session, :app_group_id
 
-    def initialize(session, app_group_id, connection:)
+    def initialize(session, app_group_id, connection: nil)
       @session = session
       @app_group_id = app_group_id
       @connection = connection

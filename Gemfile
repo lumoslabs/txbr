@@ -2,11 +2,11 @@ source 'https://rubygems.org'
 
 gemspec
 
-gem 'puma', '~> 2.15'
+gem 'puma', '~> 3.11'
+gem 'rake'
 
 group :development, :test do
   gem 'pry-byebug'
-  gem 'rake'
 end
 
 group :test do
