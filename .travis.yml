@@ -1,0 +1,17 @@
+sudo: false
+language: ruby
+cache:
+  - bundler
+install: true # skip bundle install
+notifications:
+  email: false
+
+matrix:
+  include:
+    - env: TRAVIS_JOB=build
+      sudo: required
+      services: docker
+    - env: TRAVIS_JOB=test
+      rvm: 2.5.1
+
+script: bash ./script/travis.sh
