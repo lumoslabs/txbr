@@ -14,9 +14,26 @@ module Txbr
   autoload :Uploader,               'txbr/uploader'
   autoload :Utils,                  'txbr/utils'
 
-  class BrazeApiError < StandardError; end
-  class BrazeUnauthorizedError < BrazeApiError; end
-  class BrazeNotFoundError < BrazeApiError; end
+  class BrazeApiError < StandardError
+    attr_reader :status_code
+
+    def initialize(message, status_code)
+      super(message)
+      @status_code = status_code
+    end
+  end
+
+  class BrazeUnauthorizedError < BrazeApiError
+    def initialize(message)
+      super(message, 401)
+    end
+  end
+
+  class BrazeNotFoundError < BrazeApiError
+    def initialize(message)
+      super(message, 404)
+    end
+  end
 
   class << self
     def handler_for(project)

@@ -14,27 +14,25 @@ module Txbr
 
       strings_map.each_pair do |project_slug, resource_map|
         resource_map.each_pair do |resource_slug, strings_manifest|
-          strings_manifest.prefixes.each do |prefix|
-            phrases = strings_manifest.each_string(prefix)
-              .reject { |_, value| value.nil? }
-              .map do |path, value|
-                { 'key' => path.join('.'), 'string' => value }
-              end
+          phrases = strings_manifest.each_string
+            .reject { |_, value| value.nil? }
+            .map do |path, value|
+              { 'key' => path.join('.'), 'string' => value }
+            end
 
-            next if phrases.empty?
+          next if phrases.empty?
 
-            resource = Txgh::TxResource.new(
-              project_slug,
-              resource_slug,
-              project.strings_format,
-              project.source_lang,
-              template_name,
-              {},   # lang_map (none)
-              nil   # translation_file (none)
-            )
+          resource = Txgh::TxResource.new(
+            project_slug,
+            resource_slug,
+            project.strings_format,
+            project.source_lang,
+            template_name,
+            {},   # lang_map (none)
+            nil   # translation_file (none)
+          )
 
-            yield Txgh::ResourceContents.from_phrase_list(resource, phrases)
-          end
+          yield Txgh::ResourceContents.from_phrase_list(resource, phrases)
         end
       end
     end

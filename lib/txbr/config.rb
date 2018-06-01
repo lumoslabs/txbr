@@ -13,7 +13,9 @@ module Txbr
 
       def raw_config
         @raw_config ||= begin
-          scheme, payload = ENV['TXBR_CONFIG'].split('://')
+          scheme_end_idx = ENV['TXBR_CONFIG'].index('://')
+          scheme = ENV['TXBR_CONFIG'][0...scheme_end_idx]
+          payload = ENV['TXBR_CONFIG'][(scheme_end_idx + 3)..-1]
           send(:"load_#{scheme}", payload)
         end
       end

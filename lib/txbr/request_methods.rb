@@ -34,7 +34,7 @@ module Txbr
           raise BrazeNotFoundError, "404 Not Found: #{response.env.url}"
         else
           if (response.status / 100) != 2
-            raise TransifexApiError.new(
+            raise Txbr::BrazeApiError.new(
               "HTTP #{response.status}: #{response.env.url}, body: #{response.body}",
               response.status
             )

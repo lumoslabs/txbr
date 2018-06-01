@@ -70,7 +70,7 @@ module Txbr
             next unless connected_content_prefixes.include?(prefix)
             default = node.filters.find { |f| f.first == 'default' }
 
-            manifest.add(prefix, path, default&.last&.first)
+            manifest.add(path, default&.last&.first)
         end
 
         if node.respond_to?(:nodelist)
@@ -84,6 +84,8 @@ module Txbr
     end
 
     def connected_content_tags
+      # this assumes these are basically at the top of the template and not
+      # nested inside other liquid tags
       @connected_content_tags ||= liquid_template.root.nodelist.select do |node|
         node.is_a?(Txbr::ConnectedContentTag)
       end

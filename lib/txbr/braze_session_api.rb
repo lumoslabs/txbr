@@ -9,9 +9,10 @@ module Txbr
 
     attr_reader :session, :app_group_id
 
-    def initialize(session, app_group_id)
+    def initialize(session, app_group_id, connection:)
       @session = session
       @app_group_id = app_group_id
+      @connection = connection
     end
 
     def each_email_template(start: 0, &block)
@@ -25,8 +26,8 @@ module Txbr
         )
 
         templates['results'].each(&block)
-        start += templates.size
-        break if templates.size < EMAIL_TEMPLATE_BATCH_SIZE
+        start += templates['results'].size
+        break if templates['results'].size < EMAIL_TEMPLATE_BATCH_SIZE
       end
     end
 
@@ -40,7 +41,7 @@ module Txbr
       retried = false
 
       begin
-        super
+        super(*args, { cookie: "_session_id=#{session.session_id}" })
       rescue BrazeUnauthorizedError => e
         raise e if retried
         reset!
@@ -50,7 +51,6 @@ module Txbr
     end
 
     def reset!
-      @connection = nil
       session.reset!
     end
 
@@ -58,15 +58,14 @@ module Txbr
       @connection ||= begin
         options = {
           url: session.api_url,
-          params: { app_group_id: app_group_id },
-          headers: { cookie: "_session_id=#{session.session_id}" }
+          params: { app_group_id: app_group_id }
         }
 
         Faraday.new(options) do |faraday|
           faraday.request(:json)
           faraday.response(:logger)
           faraday.use(FaradayMiddleware::FollowRedirects)
-          faraday.adapter(Faraday.default_adapter)
+          faraday.adapter(:net_http)
         end
       end
     end

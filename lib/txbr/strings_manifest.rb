@@ -1,5 +1,3 @@
-require 'txgh'
-
 module Txbr
   class StringsManifest
     include Enumerable
@@ -8,17 +6,8 @@ module Txbr
       @strings ||= {}
     end
 
-    # prefix: the value specified in the connected_content "save" option
-    #
-    # path: an array of path strings, eg ['foo', 'bar']. The whole path
-    # is the prefix plus the path, eg. ['prefix', 'foo', 'bar'], which
-    # is present in the Liquid template as {{prefix.foo.bar}}.
-    #
-    # value: the value to associate with this key
-    def add(prefix, path, value)
-      root = @strings[prefix] ||= {}
-
-      root = path[0...-1].inject(root) do |ret, key|
+    def add(path, value)
+      root = path[0...-1].inject(@strings) do |ret, key|
         ret[key] ||= {}
       end
 
@@ -33,10 +22,8 @@ module Txbr
     end
 
     def merge!(other_manifest)
-      other_manifest.prefixes.each do |prefix|
-        other_manifest.each_string(prefix) do |path, value|
-          add(prefix, path, value)
-        end
+      other_manifest.each_string do |path, value|
+        add(path, value)
       end
     end
 
@@ -44,13 +31,9 @@ module Txbr
       @strings
     end
 
-    def each(prefix, &block)
-      return to_enum(__method__, prefix) unless block_given?
-      each_helper(@strings[prefix], [], &block)
-    end
-
-    def prefixes
-      @strings.keys
+    def each(&block)
+      return to_enum(__method__) unless block_given?
+      each_helper(@strings, [], &block)
     end
 
     alias each_string each

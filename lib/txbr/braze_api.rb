@@ -34,7 +34,7 @@ module Txbr
           faraday.request(:json)
           faraday.response(:logger)
           faraday.use(FaradayMiddleware::FollowRedirects)
-          faraday.adapter(Faraday.default_adapter)
+          faraday.adapter(:net_http)
         end
       end
     end

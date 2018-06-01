@@ -22,6 +22,9 @@ module Txbr
       @braze_app_group_id = options.fetch(:braze_app_group_id)
       @braze_email_address = options.fetch(:braze_email_address)
       @braze_password = options.fetch(:braze_password)
+
+      @braze_api = options[:braze_api]
+      @transifex_api = options[:transifex_api]
     end
 
     def braze_session
