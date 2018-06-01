@@ -45,6 +45,8 @@ module Txbr
           Liquid::Template.parse(details[name])
         )
 
+        next unless component.assignments['project_slug']
+        next unless component.assignments['resource_slug']
         next unless component.translation_enabled?
 
         (ret[component.project_slug] ||= {}).tap do |proj_map|

@@ -9,6 +9,14 @@ module Txbr
         end
       end
 
+      def transifex_api_username
+        raw_config[:transifex_api_username]
+      end
+
+      def transifex_api_password
+        raw_config[:transifex_api_password]
+      end
+
       private
 
       def raw_config

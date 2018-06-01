@@ -20,7 +20,7 @@ module Txbr
 
     def translation_enabled?
       # translation is disabled by default
-      assignments.fetch('translation_enabled', false)
+      assignments.fetch('translation_enabled', true)
     end
 
     def assignments

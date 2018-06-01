@@ -14,14 +14,15 @@ describe Txbr::Config do
 
   shared_examples 'a successful configuration' do
     it 'is configured correctly' do
+      expect(described_class.transifex_api_username).to eq('transifex_username')
+      expect(described_class.transifex_api_password).to eq('transifex_password')
+
       expect(Txbr::Config.projects.size).to eq(1)
       project = Txbr::Config.projects.first
 
       expect(project.handler_id).to eq('email-templates')
       expect(project.braze_api_key).to eq('braze_api_key')
       expect(project.braze_api_url).to eq('https://somewhere.braze.com')
-      expect(project.transifex_api_username).to eq('transifex_username')
-      expect(project.transifex_api_password).to eq('transifex_password')
       expect(project.strings_format).to eq('YML')
       expect(project.source_lang).to eq('en')
 

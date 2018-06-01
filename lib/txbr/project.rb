@@ -3,7 +3,6 @@ require 'txgh'
 module Txbr
   class Project
     attr_reader :braze_api_url, :braze_api_key, :handler_id
-    attr_reader :transifex_api_username, :transifex_api_password
     attr_reader :strings_format, :source_lang
 
     # @TODO: remove these when Braze gives us the endpoints we asked for
@@ -13,8 +12,6 @@ module Txbr
       @braze_api_url = options.fetch(:braze_api_url)
       @braze_api_key = options.fetch(:braze_api_key)
       @handler_id = options.fetch(:handler_id)
-      @transifex_api_username = options.fetch(:transifex_api_username)
-      @transifex_api_password = options.fetch(:transifex_api_password)
       @strings_format = options.fetch(:strings_format)
       @source_lang = options.fetch(:source_lang)
 
@@ -41,7 +38,8 @@ module Txbr
 
     def transifex_api
       @transifex_api ||= Txgh::TransifexApi.create_from_credentials(
-        transifex_api_username, transifex_api_password
+        Txbr::Config.transifex_api_username,
+        Txbr::Config.transifex_api_password
       )
     end
 
