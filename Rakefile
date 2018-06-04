@@ -74,8 +74,7 @@ namespace :publish do
   task :all do
     task_names = %w(
       version:bump version:history version:commit_and_push
-      publish:tag publish:update_docker_base_image publish:build_docker
-      publish:publish_docker publish:build_gem publish:publish_gem
+      publish:tag publish:build_gem publish:publish_gem
     )
 
     task_names.each do |task_name|
@@ -96,19 +95,6 @@ namespace :publish do
 
   task :tag do
     system("git tag -a v#{Txbr::VERSION} && git push origin --tags")
-  end
-
-  task :update_docker_base_image do
-    system("docker pull ruby:2.5")
-  end
-
-  task :build_docker do
-    system("docker build -t #{DOCKER_REPO}:latest -t #{DOCKER_REPO}:v#{Txbr::VERSION} .")
-  end
-
-  task :publish_docker do
-    system("docker push #{DOCKER_REPO}:latest")
-    system("docker push #{DOCKER_REPO}:v#{Txbr::VERSION}")
   end
 
   task :build_gem => [:build]  # use preexisting build task from rubygems/package_task
