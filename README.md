@@ -105,7 +105,14 @@ The endpoint will be available at http://your_txbr_server.com/strings.json and a
 3. **locale**: The locale (i.e. language) to fetch translations for.
 4. **strings_format**: The Transifex-supported strings format the resource was created with. In our examples, we have used "YML".
 
-The easiest way to get
+The easiest way to get up and running is to use the Txbr Docker image. Pull the image, then start it by passing your YAML configuration as an environment variable.
+
+```bash
+docker pull quay.io/lumoslabs/txbr:master
+docker run -p 9300:9300 \
+  -e "TXBR_CONFIG=raw://$(cat path/to/config.yml)" \
+  quay.io/lumoslabs/txbr:master
+```
 
 ### Rake Tasks
 
