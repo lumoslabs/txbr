@@ -61,6 +61,8 @@ module Txbr
           # divide the strings into individual Transifex resources
           # while the rest of the lookups form the string's key.
           when Liquid::Variable
+            next unless node.name.is_a?(Liquid::VariableLookup)
+
             prefix = node.name.name
             path = node.name.lookups
 
