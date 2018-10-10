@@ -40,7 +40,7 @@ module Txbr
     private
 
     def strings_map
-      @strings_map ||= %w(template subject preheader).each_with_object({}) do |name, ret|
+      @strings_map ||= %w(body subject preheader).each_with_object({}) do |name, ret|
         component = EmailTemplateComponent.new(
           Liquid::Template.parse(details[name])
         )
@@ -58,7 +58,7 @@ module Txbr
     end
 
     def template_name
-      details['name']
+      details['template_name']
     end
 
     def details

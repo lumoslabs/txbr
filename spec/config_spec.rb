@@ -25,11 +25,6 @@ describe Txbr::Config do
       expect(project.braze_api_url).to eq('https://somewhere.braze.com')
       expect(project.strings_format).to eq('YML')
       expect(project.source_lang).to eq('en')
-
-      # @TODO: remove once Braze implements the endpoints we asked for
-      expect(project.braze_email_address).to eq('braze@email.com')
-      expect(project.braze_password).to eq('braze_password')
-      expect(project.braze_app_group_id).to eq('5551212')
     end
   end
 

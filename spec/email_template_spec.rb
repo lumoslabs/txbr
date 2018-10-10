@@ -7,7 +7,7 @@ describe Txbr::EmailTemplate do
   let(:email_template_id) { 'abc123' }
   let(:email_template) { described_class.new(project, email_template_id) }
 
-  let(:template_html) do
+  let(:body_html) do
     <<~HTML
       <html>
         <head>
@@ -51,12 +51,16 @@ describe Txbr::EmailTemplate do
   describe '#each_resource' do
     let(:braze_interactions) do
       [{
-        request: { verb: 'get', url: "engagement/email_templates/#{email_template_id}" },
+        request: {
+          verb: 'get',
+          url: Txbr::BrazeApi::TEMPLATE_INFO_PATH,
+          params: { email_template_id: email_template_id }
+        },
         response: {
           status: 200,
           body: {
-            name: 'Super Slick Awesome',
-            template: template_html,
+            template_name: 'Super Slick Awesome',
+            body: body_html,
             subject: subject_html,
             preheader: preheader_html
           }.to_json

@@ -8,15 +8,22 @@ describe Txbr::Uploader do
 
   let(:braze_interactions) do
     [{
-      request: { verb: 'get', url: 'engagement/email_templates', start: 0, length: 1 },
-      response: { status: 200, body: { results: [{ id: email_template_id }] }.to_json }
+      request: {
+        verb: 'get',
+        url: Txbr::BrazeApi::TEMPLATE_LIST_PATH,
+        params: { offset: 1, limit: Txbr::BrazeApi::TEMPLATE_BATCH_SIZE }
+      },
+      response: {
+        status: 200,
+        body: { templates: [{ email_template_id: email_template_id }] }.to_json
+      }
     }, {
-      request: { verb: 'get', url: "engagement/email_templates/#{email_template_id}" },
+      request: { verb: 'get', url: Txbr::BrazeApi::TEMPLATE_INFO_PATH, params: { email_template_id: email_template_id } },
       response: {
         status: 200,
         body: {
-          name: 'Super Slick Awesome',
-          template: template_html,
+          template_name: 'Super Slick Awesome',
+          body: body_html,
           subject: '',
           preheader: ''
         }.to_json
@@ -35,7 +42,7 @@ describe Txbr::Uploader do
     }]
   end
 
-  let(:template_html) do
+  let(:body_html) do
     <<~HTML
       <html>
         <head>

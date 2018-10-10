@@ -1,14 +1,11 @@
 require 'spec_helper'
-require 'support/fake_braze_session'
 require 'support/fake_connection'
 
-describe Txbr::BrazeSessionApi do
-  let(:session_id) { 'session_id' }
-  let(:app_group_id) { 'app_group_id' }
+describe Txbr::BrazeApi do
+  let(:api_key) { 'abc123' }
   let(:api_url) { 'https://somewhere.braze.com' }
-  let(:session) { FakeBrazeSession.new(api_url, session_id) }
   let(:connection) { FakeConnection.new(interactions) }
-  let(:client) { described_class.new(session, app_group_id, connection: connection) }
+  let(:client) { described_class.new(api_key, api_url, connection: connection) }
 
   shared_examples 'a client request that handles errors' do
     context 'when the resource is not found' do
@@ -18,7 +15,7 @@ describe Txbr::BrazeSessionApi do
         end
       end
 
-      it 'raises an error' do
+      it 'raises a not found error' do
         expect { subject }.to raise_error(Txbr::BrazeNotFoundError)
       end
     end
@@ -33,9 +30,8 @@ describe Txbr::BrazeSessionApi do
         end
       end
 
-      it 'resets the session and tries again' do
-        expect { subject }.to_not raise_error
-        expect(session).to be_reset
+      it 'raises an unauthorized error' do
+        expect { subject }.to raise_error(Txbr::BrazeUnauthorizedError)
       end
     end
 
@@ -46,34 +42,37 @@ describe Txbr::BrazeSessionApi do
         end
       end
 
-      it 'raises an error' do
+      it 'raises a generic error' do
         expect { subject }.to raise_error(Txbr::BrazeApiError)
       end
     end
   end
 
   describe '#each_email_template' do
-    before do
-      stub_const("#{described_class.name}::EMAIL_TEMPLATE_BATCH_SIZE", 1)
-    end
-
     subject { client.each_email_template.to_a }
+
+    before do
+      stub_const("#{described_class.name}::TEMPLATE_BATCH_SIZE", 1)
+    end
 
     let(:interactions) do
       [{
-        request: { verb: 'get', url: 'engagement/email_templates', start: 0, length: 1 },
-        response: { status: 200, body: { results: [{ id: '123abc' }] }.to_json }
+        request: { verb: 'get', url: described_class::TEMPLATE_LIST_PATH, params: { offset: 1, limit: 1 } },
+        response: { status: 200, body: { templates: [{ email_template_id: '123abc' }] }.to_json }
       }, {
-        request: { verb: 'get', url: 'engagement/email_templates', start: 1, length: 1 },
-        response: { status: 200, body: { results: [{ id: '456def' }] }.to_json }
+        request: { verb: 'get', url: described_class::TEMPLATE_LIST_PATH, params: { offset: 2, limit: 1 } },
+        response: { status: 200, body: { templates: [{ email_template_id: '456def' }] }.to_json }
       }, {
-        request: { verb: 'get', url: 'engagement/email_templates', start: 2, length: 0 },
-        response: { status: 200, body: { results: [] }.to_json }
+        request: { verb: 'get', url: described_class::TEMPLATE_LIST_PATH, params: { offset: 3, limit: 1 } },
+        response: { status: 200, body: { templates: [] }.to_json }
       }]
     end
 
     it 'yields each template' do
-      expect(subject).to eq([{ 'id' => '123abc' }, { 'id' => '456def' }])
+      expect(subject).to eq([
+        { 'email_template_id' => '123abc' },
+        { 'email_template_id' => '456def' }
+      ])
     end
 
     it_behaves_like 'a client request that handles errors'
@@ -85,16 +84,16 @@ describe Txbr::BrazeSessionApi do
 
     let(:details) do
       {
-        'name' => 'Foo Template',
-        'template' => "<html><body>I'm a little teapot</body</html>",
+        'template_name' => 'Foo Template',
+        'body' => "<html><body>I'm a little teapot</body</html>",
         'subject' => 'Subject subject',
-        'preheader' => 'Preheader preheader',
+        'preheader' => 'Preheader preheader'
       }
     end
 
     let(:interactions) do
       [{
-        request: { verb: 'get', url: "engagement/email_templates/#{email_template_id}" },
+        request: { verb: 'get', url: described_class::TEMPLATE_INFO_PATH, params: { email_template_id: email_template_id } },
         response: { status: 200, body: details.to_json }
       }]
     end
