@@ -1,3 +1,6 @@
+# 1.1.1
+* Remove additional session-based API specs and dependencies.
+
 # 1.1.0
 * Use Braze REST API instead of session-based API.
 

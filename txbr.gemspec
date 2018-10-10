@@ -17,7 +17,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'faraday', '~> 0.9'
   s.add_dependency 'faraday_middleware', '~> 0.10'
   s.add_dependency 'liquid', '~> 4.0'
-  s.add_dependency 'mechanize', '~> 2.7'
   s.add_dependency 'sinatra', '~> 1.4'
   s.add_dependency 'sinatra-contrib', '~> 1.4'
   s.add_dependency 'txgh', '~> 6.6'

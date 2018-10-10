@@ -3,8 +3,6 @@ require 'liquid'
 module Txbr
   autoload :Application,            'txbr/application'
   autoload :BrazeApi,               'txbr/braze_api'
-  autoload :BrazeSession,           'txbr/braze_session'
-  autoload :BrazeSessionApi,        'txbr/braze_session_api'
   autoload :Commands,               'txbr/commands'
   autoload :Config,                 'txbr/config'
   autoload :EmailTemplate,          'txbr/email_template'
