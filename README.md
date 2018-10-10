@@ -47,16 +47,14 @@ Configuration
 Txbr requires several configuration options in order to communicate with Braze and Transifex. Configuration is done in the YAML file format. Here's an example:
 
 ```yaml
+transifex_api_username: tx_username
+transifex_api_password: tx_password
 projects:
   - handler_id: email-templates
-    transifex_api_username: tx_username
-    transifex_api_password: tx_password
     strings_format: YML
     source_lang: en
-    braze_email_address: login@yourcompany.com
-    braze_password: your_braze_password
-    braze_app_group_id: your_braze_app_group_id
-    braze_api_url: https://dashboard-03.braze.com/
+    braze_api_url: https://rest.iad-01.braze.com/ # or whatever
+    braze_api_key: abc123
 
 ```
 
