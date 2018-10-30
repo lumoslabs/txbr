@@ -17,7 +17,7 @@ Here's an example template for the impatient:
   <head>
     {% assign project_slug = "my_transifex_project" %}
     {% assign resource_slug = "my_transifex_resource" %}
-    {% connected_content https://your_txbr_server.com/strings.json?project_slug={{project_slug}}&resource_slug={{resource_slug}}&locale={{${language} | default: 'en'}}&strings_format=YML :basic_auth txbr :save strings %}
+    {% connected_content https://your_txbr_server.com/strings.json?project_slug={{project_slug}}&resource_slug={{resource_slug}}&locale={{${language} | default: 'en'}}&strings_format=YML :basic_auth txbr :save strings :retry %}
   </head>
   <body>
     {{strings.header.title | default: "Buy my stuff!"}}
