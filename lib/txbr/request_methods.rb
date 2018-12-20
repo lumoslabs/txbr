@@ -1,7 +1,5 @@
 module Txbr
   module RequestMethods
-    private
-
     def get_json(url, params = {})
       response = get(url, params)
       JSON.parse(response.body)

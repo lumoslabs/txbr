@@ -9,51 +9,20 @@ module Txbr
       @email_template_id = email_template_id
     end
 
-    def each_resource
+    def each_resource(&block)
       return to_enum(__method__) unless block_given?
-
-      strings_map.each_pair do |project_slug, resource_map|
-        resource_map.each_pair do |resource_slug, strings_manifest|
-          phrases = strings_manifest.each_string
-            .reject { |_, value| value.nil? }
-            .map do |path, value|
-              { 'key' => path.join('.'), 'string' => value }
-            end
-
-          next if phrases.empty?
-
-          resource = Txgh::TxResource.new(
-            project_slug,
-            resource_slug,
-            project.strings_format,
-            project.source_lang,
-            template_name,
-            {},   # lang_map (none)
-            nil   # translation_file (none)
-          )
-
-          yield Txgh::ResourceContents.from_phrase_list(resource, phrases)
-        end
-      end
+      template_group.each_resource(&block)
     end
 
     private
 
-    def strings_map
-      @strings_map ||= %w(body subject preheader).each_with_object({}) do |name, ret|
-        component = EmailTemplateComponent.new(
-          Liquid::Template.parse(details[name])
-        )
+    def template_group
+      @template_group ||= TemplateGroup.new(template_name, templates, project)
+    end
 
-        next unless component.assignments['project_slug']
-        next unless component.assignments['resource_slug']
-        next unless component.translation_enabled?
-
-        (ret[component.project_slug] ||= {}).tap do |proj_map|
-          (proj_map[component.resource_slug] ||= StringsManifest.new).tap do |manifest|
-            manifest.merge!(component.strings)
-          end
-        end
+    def templates
+      %w(body subject preheader).map do |name|
+        Txbr::Template.new(::Liquid::Template.parse(details[name]))
       end
     end
 
@@ -62,7 +31,7 @@ module Txbr
     end
 
     def details
-      @details ||= project.braze_api.get_email_template_details(
+      @details ||= project.braze_api.email_templates.details(
         email_template_id: email_template_id
       )
     end
