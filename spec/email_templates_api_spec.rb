@@ -1,5 +1,7 @@
 require 'spec_helper'
 require 'support/fake_connection'
+require 'shared_examples/api_errors'
+
 require 'json'
 
 describe Txbr::EmailTemplatesApi do
@@ -9,48 +11,7 @@ describe Txbr::EmailTemplatesApi do
   let(:braze_api) { Txbr::BrazeApi.new(api_key, api_url, connection: connection) }
   let(:client) { described_class.new(braze_api) }
 
-  shared_examples 'a client request that handles errors' do
-    context 'when the resource is not found' do
-      let(:interactions) do
-        super().tap do |inter|
-          inter[0][:response][:status] = 404
-        end
-      end
-
-      it 'raises a not found error' do
-        expect { subject }.to raise_error(Txbr::BrazeNotFoundError)
-      end
-    end
-
-    context 'when the request is unauthorized' do
-      let(:interactions) do
-        super().tap do |inter|
-          inter.unshift(
-            request: inter[0][:request],
-            response: { status: 401 }
-          )
-        end
-      end
-
-      it 'raises an unauthorized error' do
-        expect { subject }.to raise_error(Txbr::BrazeUnauthorizedError)
-      end
-    end
-
-    context 'when some other bad thing happens' do
-      let(:interactions) do
-        super().tap do |inter|
-          inter[0][:response][:status] = 500
-        end
-      end
-
-      it 'raises a generic error' do
-        expect { subject }.to raise_error(Txbr::BrazeApiError)
-      end
-    end
-  end
-
-  describe '#each_email_template' do
+  describe '#each' do
     subject { client.each.to_a }
 
     before do
@@ -80,7 +41,7 @@ describe Txbr::EmailTemplatesApi do
     it_behaves_like 'a client request that handles errors'
   end
 
-  describe '#get_email_template_details' do
+  describe '#details' do
     subject { client.details(email_template_id: email_template_id) }
     let(:email_template_id) { 'abc123' }
 

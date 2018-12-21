@@ -33,22 +33,7 @@ module Txbr
     def details
       @details ||= project.braze_api.campaigns.details(
         campaign_id: campaign_id
-      ).tap do |deets|  # TODO: remove
-        deets['messages'].each_pair do |_, props|
-          props['message'] = <<~END
-            <html>
-              <head>
-                {% assign project_slug = "my_transifex_project" %}
-                {% assign resource_slug = "my_transifex_resource" %}
-                {% connected_content http://txgh.lumoslabs.com/api/strings.json?project_slug={{project_slug}}&resource_slug={{resource_slug}}&locale={{${language} | default: 'en'}}&strings_format=YML :basic_auth txgh :save strings :retry %}
-              </head>
-              <body>
-                {{strings.header.title | default: "Buy my stuff!"}}
-              </body>
-            </html>
-          END
-        end
-      end
+      )
     end
   end
 end

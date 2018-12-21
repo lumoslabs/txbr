@@ -1,5 +1,4 @@
 require 'abroad'
-require 'cgi'
 require 'json'
 require 'sinatra/json'
 require 'txgh'
@@ -10,8 +9,6 @@ module Txbr
     REQUIRED_PARAMS = %w(project_slug resource_slug locale strings_format).freeze
 
     get '/strings.json' do
-      params = CGI.parse(request.query_string)
-
       begin
         REQUIRED_PARAMS.each do |required_param|
           unless params.include?(required_param)
@@ -25,18 +22,14 @@ module Txbr
           Txbr::Config.transifex_api_password
         )
 
-        project_slug = params['project_slug'].first
-        resource_slug = params['resource_slug'].first
-        locale = params['locale'].first
-
-        strings_format = Txgh::ResourceContents::EXTRACTOR_MAP[
-          params['strings_format'].first
-        ]
+        source = transifex_client.download(
+          params[:project_slug], params[:resource_slug], params[:locale]
+        )
 
         target = StringIO.new
-        source = transifex_client.download(project_slug, resource_slug, locale)
+        strings_format = Txgh::ResourceContents::EXTRACTOR_MAP[params[:strings_format]]
 
-        Abroad.serializer(TARGET_FORMAT).from_stream(target, locale) do |serializer|
+        Abroad.serializer(TARGET_FORMAT).from_stream(target, params[:locale]) do |serializer|
           Abroad.extractor(strings_format)
             .from_string(source)
             .extract_each do |key, value|

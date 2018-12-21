@@ -25,13 +25,17 @@ Here's an example template for the impatient:
 </html>
 ```
 
-There are several important bits in the example above:
+### The `connected_content` Tag
 
-1. Every template you would like Txbr to manage must contain these three required Liquid tags: `assign project_slug`, `assign resource_slug`, and `connected_content`. The first two correspond to the Transifex project and resource in which you would like to store the template's strings, and the third is the mechanism by which translations are fetched and inserted into the template when it is previewed or delivered.
-2. The project slug should correspond to a valid Transifex project. You'll need to create the project in Transifex, then copy the slug from the URL.
-3. The resource slug should be unique within the Transifex project and must only contain uppercase and lowercase letters, numbers, underscores (i.e. "_"), and dashes (i.e. "-"). It's a safe bet to simply use the template's API identifier found at the bottom of the template's configuration page. Txbr itself places no restrictons on and performs no validation against this field, so it can contain any custom slug you want.
-4. The `connected_content` tag fetches translated content from Transifex using the project and resource slugs you assigned earlier in the locale of the "current" user. When previewing your template, the locale can be set in the left-hand sidebar via a simulated current user.
-5. Notice the `{{strings.header.title | default: "Buy my stuff!}}` tag. This defines and fetches a string at the key `header.title`, with a default English value of "Buy my stuff!" Txbr uses this key and default value to construct the translation file it will submit to Transifex. Providing a default value allows for easy template construction and previewing, since your template probably won't be translated immediately. Braze will fall back to this value if the translation doesn't yet exist. Liquid tags that do not specify a default value will not be included in the submission to Transifex. Finally, pay close attention to the `strings.` prefix. It corresponds to the `connected_content` tag's `:save strings` option. The `:save` option tells Braze to store the translated strings in a template variable called `strings`, which can then be used to grab individual strings. The value given to `:save` must be the same value used as the key prefix. For example, simply typing `{{header.title}}` won't work.
+Every template you would like Txbr to manage should include at least one `connected_content` tag. Each tag must include a URL with `project_slug` and `resource_slug` as GET parameters. These correspond to the Transifex project and resource you would like to store the template's strings in.
+
+The project slug should correspond to a valid Transifex project. You'll need to create the project in Transifex, then copy the slug from the URL.
+
+The resource slug should be unique within the Transifex project and must only contain uppercase and lowercase letters, numbers, underscores (i.e. "\_"), and dashes (i.e. "-"). It's a safe bet to simply use the template's API identifier found at the bottom of the template's configuration page. Txbr itself places no restrictons on and performs no validation against this field, so it can contain any custom slug you want.
+
+### Translating Content
+
+Strings can be inserted into the template using liquid tags. For example, the `{{strings.header.title | default: "Buy my stuff!}}` tag above defines and fetches a string at the key `header.title`, with a default English value of "Buy my stuff!" Txbr uses this key and default value to construct the translation file it will ultimately submit to Transifex. Providing a default value allows for easy template construction and previewing, since your template probably won't be translated immediately. Braze will fall back to this value if the translation doesn't yet exist. Liquid tags that do not specify a default value will not be included in the submission to Transifex. Finally, pay close attention to the `strings.` prefix. It corresponds to the `connected_content` tag's `:save strings` option. The `:save` option tells Braze to store the translated strings in a template variable called `strings`, which can then be used to grab individual strings. The value given to `:save` must be the same value used as the key prefix. For example, simply typing `{{header.title}}` won't work.
 
 ### Enabling Translation
 
@@ -40,6 +44,8 @@ Template translation is enabled by default. To skip translating a given template
 ```liquid
 {% assign translation_enabled = false %}
 ```
+
+**NOTE**: The `translation_enabled` variable assignment can be placed anywhere in the template, and affects the entire template. In other words, it does not just disable translations for content that comes after it. Its presence disables translations template-wide.
 
 Configuration
 ---
@@ -58,10 +64,10 @@ projects:
 
 ```
 
-1. The `handler_id` indicates what kind of content this project should contain. In this case, we're translating email templates, the only currently supported option.
+1. The `handler_id` indicates what kind of content this project should contain. In this case, we're translating email templates. Campaigns are also supported via the handler ID `campaigns`, and are configured using the same options as email templates.
 2. Your Transifex username and password should have access to the Transifex projects you want to submit content to. You can configure access via Transifex's access control system.
 3. The `strings_format` option must be one of [Transifex's supported formats](https://docs.transifex.com/formats/introduction).
-4. The `source_lang` option should be the language in which your source strings are written in. In other words, it should be the language in which the `default:` text is written in your template's Liquid tags.
+4. The `source_lang` option should be the language in which your source strings are written. In other words, it should be the language in which the `default:` text is written in your template's Liquid tags.
 
 ### Using Configuration
 
@@ -94,7 +100,7 @@ Txbr is both a library and a server. It provides access to Transifex resources v
 
 ### API Endpoint
 
-Txbr provides a single API endpoint for retrieving translated content from Transifex. You'll need to stand up a Txbr server somewhere and make it publicly available on the Internet. The URL to your server will be used in the `connected_content` tag in your Braze templates (see above).
+Txbr provides a single API endpoint for retrieving translated content from Transifex. You'll need to stand up a Txbr server somewhere and make it publicly available on the Internet. The URL to your server should then be used in the `connected_content` tag in your Braze templates (see above).
 
 The endpoint will be available at http://your_txbr_server.com/strings.json and accepts the following required GET parameters:
 
