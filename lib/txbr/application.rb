@@ -20,33 +20,28 @@ module Txbr
           end
         end
 
-        if params['project_slug'].size != params['resource_slug'].size
-          status 400
-          return json(error: 'Different number of project and resource slugs')
-        end
-
         transifex_client = Txgh::TransifexApi.create_from_credentials(
           Txbr::Config.transifex_api_username,
           Txbr::Config.transifex_api_password
         )
 
+        project_slug = params['project_slug'].first
+        resource_slug = params['resource_slug'].first
         locale = params['locale'].first
-        strings_format = params['strings_format'].first
 
-        params['project_slug'].each_with_index do |project_slug, idx|
-          resource_slug = params['resource_slug'][idx]
-          source = transifex_client.download(project_slug, resource_slug, locale)
+        strings_format = Txgh::ResourceContents::EXTRACTOR_MAP[
+          params['strings_format'].first
+        ]
 
-          target = StringIO.new
-          strings_format = Txgh::ResourceContents::EXTRACTOR_MAP[strings_format]
+        target = StringIO.new
+        source = transifex_client.download(project_slug, resource_slug, locale)
 
-          Abroad.serializer(TARGET_FORMAT).from_stream(target, locale) do |serializer|
-            Abroad.extractor(strings_format)
-              .from_string(source)
-              .extract_each do |key, value|
-                serializer.write_key_value(key, value)
-              end
-          end
+        Abroad.serializer(TARGET_FORMAT).from_stream(target, locale) do |serializer|
+          Abroad.extractor(strings_format)
+            .from_string(source)
+            .extract_each do |key, value|
+              serializer.write_key_value(key, value)
+            end
         end
 
         status 200

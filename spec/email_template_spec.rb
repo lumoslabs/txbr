@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'support/standard_setup'
+require 'json'
 
 describe Txbr::EmailTemplate do
   include_context 'standard setup'
@@ -14,7 +15,7 @@ describe Txbr::EmailTemplate do
           {% assign project_slug = "my_project" %}
           {% assign resource_slug = "my_resource" %}
           {% assign translation_enabled = true %}
-          {% connected_content http://my_strings_api.com/ :save strings %}
+          {% connected_content http://my_strings_api.com?project_slug={{project_slug}}&resource_slug={{resource_slug}} :save strings %}
         </head>
         <body>
           {{strings.header | default: 'Buy our stuff!'}}
@@ -33,7 +34,7 @@ describe Txbr::EmailTemplate do
       {% assign project_slug = "my_project" %}
       {% assign resource_slug = "my_resource" %}
       {% assign translation_enabled = true %}
-      {% connected_content http://my_strings_api.com/ :save strings %}
+      {% connected_content http://my_strings_api.com?project_slug={{project_slug}}&resource_slug={{resource_slug}} :save strings %}
       {{strings.meta.subject_line | default: 'You lucky duck maybe'}}
     HTML
   end
@@ -43,7 +44,7 @@ describe Txbr::EmailTemplate do
       {% assign project_slug = "my_project" %}
       {% assign resource_slug = "my_resource" %}
       {% assign translation_enabled = true %}
-      {% connected_content http://my_strings_api.com/ :save strings %}
+      {% connected_content http://my_strings_api.com?project_slug={{project_slug}}&resource_slug={{resource_slug}} :save strings %}
       {{strings.meta.preheader | default: 'Our stuff is the bomb and you should buy it.'}}
     HTML
   end
@@ -53,7 +54,7 @@ describe Txbr::EmailTemplate do
       [{
         request: {
           verb: 'get',
-          url: Txbr::BrazeApi::TEMPLATE_INFO_PATH,
+          url: Txbr::EmailTemplatesApi::TEMPLATE_DETAILS_PATH,
           params: { email_template_id: email_template_id }
         },
         response: {
@@ -90,7 +91,7 @@ describe Txbr::EmailTemplate do
       tx_resource = resource.tx_resource
 
       expect(tx_resource.project_slug).to eq('my_project')
-      expect(tx_resource.resource_slug).to eq('my_resource')
+      expect(tx_resource.resource_slug).to eq('my_resource-strings')
       expect(tx_resource.source_file).to eq('Super Slick Awesome')
       expect(tx_resource.source_lang).to eq(project.source_lang)
       expect(tx_resource.type).to eq(project.strings_format)

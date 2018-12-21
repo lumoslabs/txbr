@@ -1,11 +1,13 @@
 require 'spec_helper'
 require 'support/fake_connection'
+require 'json'
 
-describe Txbr::BrazeApi do
+describe Txbr::EmailTemplatesApi do
   let(:api_key) { 'abc123' }
   let(:api_url) { 'https://somewhere.braze.com' }
   let(:connection) { FakeConnection.new(interactions) }
-  let(:client) { described_class.new(api_key, api_url, connection: connection) }
+  let(:braze_api) { Txbr::BrazeApi.new(api_key, api_url, connection: connection) }
+  let(:client) { described_class.new(braze_api) }
 
   shared_examples 'a client request that handles errors' do
     context 'when the resource is not found' do
@@ -49,7 +51,7 @@ describe Txbr::BrazeApi do
   end
 
   describe '#each_email_template' do
-    subject { client.each_email_template.to_a }
+    subject { client.each.to_a }
 
     before do
       stub_const("#{described_class.name}::TEMPLATE_BATCH_SIZE", 1)
@@ -79,7 +81,7 @@ describe Txbr::BrazeApi do
   end
 
   describe '#get_email_template_details' do
-    subject { client.get_email_template_details(email_template_id: email_template_id) }
+    subject { client.details(email_template_id: email_template_id) }
     let(:email_template_id) { 'abc123' }
 
     let(:details) do
@@ -93,7 +95,7 @@ describe Txbr::BrazeApi do
 
     let(:interactions) do
       [{
-        request: { verb: 'get', url: described_class::TEMPLATE_INFO_PATH, params: { email_template_id: email_template_id } },
+        request: { verb: 'get', url: described_class::TEMPLATE_DETAILS_PATH, params: { email_template_id: email_template_id } },
         response: { status: 200, body: details.to_json }
       }]
     end
