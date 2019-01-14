@@ -10,15 +10,21 @@ describe Txbr::Uploader do
     [{
       request: {
         verb: 'get',
-        url: Txbr::BrazeApi::TEMPLATE_LIST_PATH,
-        params: { offset: 1, limit: Txbr::BrazeApi::TEMPLATE_BATCH_SIZE }
+        url: Txbr::EmailTemplatesApi::TEMPLATE_LIST_PATH,
+        params: { offset: 1, limit: Txbr::EmailTemplatesApi::TEMPLATE_BATCH_SIZE }
       },
+
       response: {
         status: 200,
         body: { templates: [{ email_template_id: email_template_id }] }.to_json
       }
     }, {
-      request: { verb: 'get', url: Txbr::BrazeApi::TEMPLATE_INFO_PATH, params: { email_template_id: email_template_id } },
+      request: {
+        verb: 'get',
+        url: Txbr::EmailTemplatesApi::TEMPLATE_DETAILS_PATH,
+        params: { email_template_id: email_template_id }
+      },
+
       response: {
         status: 200,
         body: {
@@ -49,7 +55,7 @@ describe Txbr::Uploader do
           {% assign project_slug = "my_project" %}
           {% assign resource_slug = "my_resource" %}
           {% assign translation_enabled = true %}
-          {% connected_content http://my_strings_api.com/ :save strings %}
+          {% connected_content http://my_strings_api.com?project_slug={{project_slug}}&resource_slug={{resource_slug}} :save strings %}
         </head>
         <body>
           {{strings.header | default: 'Buy our stuff!'}}

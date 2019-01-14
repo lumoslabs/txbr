@@ -3,14 +3,23 @@ require 'liquid'
 module Txbr
   autoload :Application,            'txbr/application'
   autoload :BrazeApi,               'txbr/braze_api'
+  autoload :Campaign,               'txbr/campaign'
+  autoload :CampaignHandler,        'txbr/campaign_handler'
+  autoload :CampaignsApi,           'txbr/campaigns_api'
+  autoload :ContentTag,             'txbr/content_tag'
   autoload :Commands,               'txbr/commands'
   autoload :Config,                 'txbr/config'
   autoload :EmailTemplate,          'txbr/email_template'
   autoload :EmailTemplateComponent, 'txbr/email_template_component'
   autoload :EmailTemplateHandler,   'txbr/email_template_handler'
+  autoload :EmailTemplatesApi,      'txbr/email_templates_api'
+  autoload :Liquid,                 'txbr/liquid'
+  autoload :Metadata,               'txbr/metadata'
   autoload :Project,                'txbr/project'
   autoload :RequestMethods,         'txbr/request_methods'
   autoload :StringsManifest,        'txbr/strings_manifest'
+  autoload :Template,               'txbr/template'
+  autoload :TemplateGroup,          'txbr/template_group'
   autoload :Uploader,               'txbr/uploader'
   autoload :Utils,                  'txbr/utils'
 
@@ -52,28 +61,7 @@ module Txbr
   end
 
   Txbr.register_handler('email-templates', Txbr::EmailTemplateHandler)
+  Txbr.register_handler('campaigns', Txbr::CampaignHandler)
 
-
-  class ConnectedContentTag < Liquid::Tag
-    # This is a regular expression to pull out the variable in
-    # which to store the value returned from the call made by
-    # the connected_content filter. For example, if
-    # connected_content makes a request to http://foo.com and is
-    # told to store the results in a variable called "strings",
-    # the API response will then be accessible via the normal
-    # Liquid variable mechanism, i.e. {{...}}. Say the API at
-    # foo.com returned something like {"bar":"baz"}, then the
-    # template might contain {{strings.bar}}, which would print
-    # out "baz".
-    PREFIX_RE = /:save\s+(#{Liquid::Lexer::IDENTIFIER})/
-
-    attr_reader :tag_name, :prefix
-
-    def initialize(tag_name, arg, *)
-      @tag_name = tag_name
-      @prefix = arg.match(PREFIX_RE).captures.first
-    end
-  end
-
-  Liquid::Template.register_tag(:connected_content, ConnectedContentTag)
+  ::Liquid::Template.register_tag(:connected_content, Txbr::Liquid::ConnectedContentTag)
 end

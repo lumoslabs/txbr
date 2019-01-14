@@ -3,10 +3,6 @@ require 'faraday_middleware'
 
 module Txbr
   class BrazeApi
-    TEMPLATE_BATCH_SIZE = 35
-    TEMPLATE_LIST_PATH = 'templates/email/list'.freeze
-    TEMPLATE_INFO_PATH = 'templates/email/info'.freeze
-
     include RequestMethods
 
     attr_reader :api_key, :api_url
@@ -17,24 +13,12 @@ module Txbr
       @connection = connection
     end
 
-    def each_email_template(offset: 1, &block)
-      return to_enum(__method__, offset: offset) unless block_given?
-
-      loop do
-        templates = get_json(
-          TEMPLATE_LIST_PATH,
-          offset: offset,
-          limit: TEMPLATE_BATCH_SIZE
-        )
-
-        templates['templates'].each(&block)
-        offset += templates['templates'].size
-        break if templates['templates'].size < TEMPLATE_BATCH_SIZE
-      end
+    def email_templates
+      @email_templates ||= EmailTemplatesApi.new(self)
     end
 
-    def get_email_template_details(email_template_id:)
-      get_json(TEMPLATE_INFO_PATH, email_template_id: email_template_id)
+    def campaigns
+      @campaigns ||= CampaignsApi.new(self)
     end
 
     private

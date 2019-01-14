@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'support/standard_setup'
+require 'json'
 
 describe Txbr::EmailTemplate do
   include_context 'standard setup'
@@ -14,7 +15,8 @@ describe Txbr::EmailTemplate do
           {% assign project_slug = "my_project" %}
           {% assign resource_slug = "my_resource" %}
           {% assign translation_enabled = true %}
-          {% connected_content http://my_strings_api.com/ :save strings %}
+          {% connected_content http://my_strings_api.com?project_slug={{project_slug}}&resource_slug={{resource_slug}} :save strings %}
+          {% connected_content http://my_strings_api.com?project_slug=my_project&resource_slug=my_footer_resource :save footer %}
         </head>
         <body>
           {{strings.header | default: 'Buy our stuff!'}}
@@ -23,6 +25,7 @@ describe Txbr::EmailTemplate do
           {% else %}
             {{strings.no_discount | default: 'You get no discount'}}
           {% endif %}
+          {{footer.company | default: 'Megamarketing Corp'}}
         </body>
       </html>
     HTML
@@ -33,7 +36,7 @@ describe Txbr::EmailTemplate do
       {% assign project_slug = "my_project" %}
       {% assign resource_slug = "my_resource" %}
       {% assign translation_enabled = true %}
-      {% connected_content http://my_strings_api.com/ :save strings %}
+      {% connected_content http://my_strings_api.com?project_slug={{project_slug}}&resource_slug={{resource_slug}} :save strings %}
       {{strings.meta.subject_line | default: 'You lucky duck maybe'}}
     HTML
   end
@@ -43,7 +46,7 @@ describe Txbr::EmailTemplate do
       {% assign project_slug = "my_project" %}
       {% assign resource_slug = "my_resource" %}
       {% assign translation_enabled = true %}
-      {% connected_content http://my_strings_api.com/ :save strings %}
+      {% connected_content http://my_strings_api.com?project_slug={{project_slug}}&resource_slug={{resource_slug}} :save strings %}
       {{strings.meta.preheader | default: 'Our stuff is the bomb and you should buy it.'}}
     HTML
   end
@@ -53,7 +56,7 @@ describe Txbr::EmailTemplate do
       [{
         request: {
           verb: 'get',
-          url: Txbr::BrazeApi::TEMPLATE_INFO_PATH,
+          url: Txbr::EmailTemplatesApi::TEMPLATE_DETAILS_PATH,
           params: { email_template_id: email_template_id }
         },
         response: {
@@ -69,10 +72,9 @@ describe Txbr::EmailTemplate do
     end
 
     it 'extracts and groups all strings with the same project, resource, and prefix' do
-      resources = email_template.each_resource.to_a
-      expect(resources.size).to eq(1)
-
-      resource = resources.first
+      resource = email_template.each_resource.to_a.first
+      expect(resource.tx_resource.project_slug).to eq('my_project')
+      expect(resource.tx_resource.resource_slug).to eq('my_resource')
 
       # notice how it combined strings from the subject, preheader,
       # and template (i.e. HTML body)
@@ -94,6 +96,16 @@ describe Txbr::EmailTemplate do
       expect(tx_resource.source_file).to eq('Super Slick Awesome')
       expect(tx_resource.source_lang).to eq(project.source_lang)
       expect(tx_resource.type).to eq(project.strings_format)
+    end
+
+    it 'constructs a separate resource for the footer' do
+      footer = email_template.each_resource.to_a.last
+      expect(footer.tx_resource.project_slug).to eq('my_project')
+      expect(footer.tx_resource.resource_slug).to eq('my_footer_resource')
+
+      expect(footer.phrases).to eq([
+        { 'key' => 'company', 'string' => 'Megamarketing Corp' }
+      ])
     end
 
     context 'with translations disabled for the subject' do
@@ -120,9 +132,9 @@ describe Txbr::EmailTemplate do
         end
       end
 
-      it 'includes two resources' do
+      it 'includes the additional resource' do
         resources = email_template.each_resource.to_a
-        expect(resources.size).to eq(2)
+        expect(resources.size).to eq(3)
 
         expect(resources.first.phrases).to_not(
           include({ 'key' => 'meta.subject_line', 'string' => 'You lucky duck maybe' })
@@ -131,6 +143,9 @@ describe Txbr::EmailTemplate do
         expect(resources.last.phrases).to eq(
           [{ 'key' => 'meta.subject_line', 'string' => 'You lucky duck maybe' }]
         )
+
+        expect(resources.last.tx_resource.project_slug).to eq('my_project')
+        expect(resources.last.tx_resource.resource_slug).to eq('my_other_resource')
       end
     end
   end
