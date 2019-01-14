@@ -11,7 +11,7 @@ module Txbr
       each_template { |tmpl| tmpl.each_resource(&block) }
     end
 
-    # private
+    private
 
     def each_template
       return to_enum(__method__) unless block_given?

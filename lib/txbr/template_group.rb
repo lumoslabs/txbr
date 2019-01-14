@@ -36,7 +36,7 @@ module Txbr
 
       resource = Txgh::TxResource.new(
         metadata.project_slug,
-        "#{metadata.resource_slug}-#{metadata.prefix}",
+        metadata.resource_slug,
         project.strings_format,
         project.source_lang,
         template_name,

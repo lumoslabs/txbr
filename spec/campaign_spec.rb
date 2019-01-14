@@ -14,7 +14,7 @@ describe Txbr::Campaign do
         {% assign resource_slug = "my_resource" %}
         {% assign translation_enabled = true %}
         {% connected_content http://my_strings_api.com?project_slug={{project_slug}}&resource_slug={{resource_slug}} :save strings %}
-        {% connected_content http://my_strings_api.com?project_slug=my_project&resource_slug=my_resource :save footer %}
+        {% connected_content http://my_strings_api.com?project_slug=my_project&resource_slug=my_footer_resource :save footer %}
 
         {{strings.header | default: 'Buy our stuff!'}}
         {% if user.gets_discount? %}
@@ -60,7 +60,7 @@ describe Txbr::Campaign do
     it 'extracts and groups all strings with the same project, resource, and prefix' do
       resource = campaign.each_resource.to_a.first
       expect(resource.tx_resource.project_slug).to eq('my_project')
-      expect(resource.tx_resource.resource_slug).to eq('my_resource-strings')
+      expect(resource.tx_resource.resource_slug).to eq('my_resource')
 
       # notice how it combined strings from both messages,
       expect(resource.phrases).to eq([
@@ -76,7 +76,7 @@ describe Txbr::Campaign do
       tx_resource = resource.tx_resource
 
       expect(tx_resource.project_slug).to eq('my_project')
-      expect(tx_resource.resource_slug).to eq('my_resource-strings')
+      expect(tx_resource.resource_slug).to eq('my_resource')
       expect(tx_resource.source_file).to eq('World Domination')
       expect(tx_resource.source_lang).to eq(project.source_lang)
       expect(tx_resource.type).to eq(project.strings_format)
@@ -85,7 +85,7 @@ describe Txbr::Campaign do
     it 'constructs a separate resource for the footer' do
       footer = campaign.each_resource.to_a.last
       expect(footer.tx_resource.project_slug).to eq('my_project')
-      expect(footer.tx_resource.resource_slug).to eq('my_resource-footer')
+      expect(footer.tx_resource.resource_slug).to eq('my_footer_resource')
 
       expect(footer.phrases).to eq([
         { 'key' => 'company', 'string' => 'Megamarketing Corp' }
@@ -129,7 +129,7 @@ describe Txbr::Campaign do
         )
 
         expect(resources.first.tx_resource.project_slug).to eq('my_project')
-        expect(resources.first.tx_resource.resource_slug).to eq('my_other_resource-strings')
+        expect(resources.first.tx_resource.resource_slug).to eq('my_other_resource')
       end
     end
   end

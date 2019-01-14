@@ -42,7 +42,7 @@ describe Txbr::Uploader do
     [{
       request: {
         verb: 'get',
-        url: "#{Txgh::TransifexApi::API_ROOT}/project/my_project/resource/my_resource-strings/"
+        url: "#{Txgh::TransifexApi::API_ROOT}/project/my_project/resource/my_resource/"
       },
       response: { status: 404 }
     }]
