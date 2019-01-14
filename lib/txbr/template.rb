@@ -1,8 +1,9 @@
 module Txbr
   class Template
-    attr_reader :liquid_template
+    attr_reader :id, :liquid_template
 
-    def initialize(liquid_template)
+    def initialize(id, liquid_template)
+      @id = id
       @liquid_template = liquid_template
     end
 
