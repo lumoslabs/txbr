@@ -8,7 +8,10 @@ module Txbr
 
     def each_resource(&block)
       return to_enum(__method__) unless block_given?
-      each_template { |tmpl| tmpl.each_resource(&block) }
+
+      each_template do |tmpl|
+        tmpl.each_resource(&block)
+      end
     end
 
     private

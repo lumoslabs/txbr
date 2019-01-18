@@ -1,4 +1,5 @@
 require 'liquid'
+require 'txgh'
 
 module Txbr
   class EmailTemplate
@@ -21,8 +22,13 @@ module Txbr
     end
 
     def templates
-      %w(body subject preheader).map do |name|
-        Txbr::Template.new(email_template_id, ::Liquid::Template.parse(details[name]))
+      %w(body subject preheader).each_with_object([]) do |name, ret|
+        begin
+          liquid_tmpl = ::Liquid::Template.parse(details[name])
+          ret << Txbr::Template.new(email_template_id, liquid_tmpl)
+        rescue ::Liquid::SyntaxError => e
+          Txgh.events.publish_error!(e)
+        end
       end
     end
 

@@ -8,7 +8,11 @@ module Txbr
 
     def upload_all
       project.handler.each_resource do |resource|
-        upload_resource(resource)
+        begin
+          upload_resource(resource)
+        rescue ::Txgh::TransifexApiError => e
+          Txgh.events.publish_error!(e)
+        end
       end
     end
 

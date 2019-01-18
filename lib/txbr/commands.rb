@@ -5,8 +5,7 @@ module Txbr
         begin
           Txbr::Uploader.new(project).upload_all
         rescue => e
-          puts "An error occurred: #{e.message}"
-          puts e.backtrace
+          Txgh.events.publish_error!(e)
         end
       end
     end
