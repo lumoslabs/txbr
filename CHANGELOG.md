@@ -1,3 +1,6 @@
+# 2.0.2
+* Rescue and report errors instead of letting them interrupt all uploads.
+
 # 2.0.1
 * Fix bug causing errors to be raised when processing email templates.
 * Pull in-app message and popup text from both the "message" and "alert" fields (previously we were only pulling from "message").
