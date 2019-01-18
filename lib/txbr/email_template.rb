@@ -22,7 +22,7 @@ module Txbr
 
     def templates
       %w(body subject preheader).map do |name|
-        Txbr::Template.new(::Liquid::Template.parse(details[name]))
+        Txbr::Template.new(email_template_id, ::Liquid::Template.parse(details[name]))
       end
     end
 

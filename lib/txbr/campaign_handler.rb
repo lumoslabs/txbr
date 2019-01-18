@@ -11,7 +11,7 @@ module Txbr
       each_campaign { |campaign| campaign.each_resource(&block) }
     end
 
-    # private
+    private
 
     def each_campaign
       return to_enum(__method__) unless block_given?

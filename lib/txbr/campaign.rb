@@ -22,7 +22,8 @@ module Txbr
 
     def templates
       details['messages'].map do |message_id, props|
-        Txbr::Template.new(message_id, ::Liquid::Template.parse(props['message']))
+        message = props['message'] || props['alert']
+        Txbr::Template.new(message_id, ::Liquid::Template.parse(message))
       end
     end
 
