@@ -1,3 +1,7 @@
+# 2.0.1
+* Fix bug causing errors to be raised when processing email templates.
+* Pull in-app message and popup text from both the "message" and "alert" fields (previously we were only pulling from "message").
+
 # 2.0.0
 * Support translating in-app messages and pop-ups in campaigns.
 * Refactor string extraction logic.
