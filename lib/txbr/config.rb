@@ -1,3 +1,4 @@
+require 'erb'
 require 'yaml'
 
 module Txbr
@@ -29,11 +30,15 @@ module Txbr
       end
 
       def load_file(payload)
-        deep_symbolize_keys(YAML.load_file(payload))
+        deep_symbolize_keys(parse(File.read(payload)))
       end
 
       def load_raw(payload)
-        deep_symbolize_keys(YAML.load(payload))
+        deep_symbolize_keys(parse(payload))
+      end
+
+      def parse(str)
+        YAML.load(ERB.new(str).result(binding))
       end
 
       def deep_symbolize_keys(obj)
