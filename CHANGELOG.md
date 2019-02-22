@@ -1,3 +1,6 @@
+# 2.1.0
+* Add support for ERB tags in config files.
+
 # 2.0.2
 * Rescue and report errors instead of letting them interrupt all uploads.
 
