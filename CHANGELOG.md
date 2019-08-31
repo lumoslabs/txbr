@@ -1,3 +1,6 @@
+# 2.2.0
+* Also extract strings from email templates attached to campaigns.
+
 # 2.1.0
 * Add support for ERB tags in config files.
 

@@ -2,6 +2,8 @@ require 'liquid'
 
 module Txbr
   class Campaign
+    TEMPLATE_KEYS = %w(body subject preheader message alert).freeze
+
     attr_reader :project, :campaign_id
 
     def initialize(project, campaign_id)
@@ -21,9 +23,16 @@ module Txbr
     end
 
     def templates
-      details['messages'].map do |message_id, props|
-        message = props['message'] || props['alert']
-        Txbr::Template.new(message_id, ::Liquid::Template.parse(message))
+      details['messages'].flat_map do |message_id, props|
+        TEMPLATE_KEYS.each_with_object([]) do |key, ret|
+          begin
+            if message = props[key]
+              ret << Txbr::Template.new(message_id, ::Liquid::Template.parse(message))
+            end
+          rescue ::Liquid::SyntaxError => e
+            Txgh.events.publish_error!(e)
+          end
+        end
       end
     end
 

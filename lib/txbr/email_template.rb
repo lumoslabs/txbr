@@ -3,6 +3,8 @@ require 'txgh'
 
 module Txbr
   class EmailTemplate
+    TEMPLATE_KEYS = %w(body subject preheader).freeze
+
     attr_reader :project, :email_template_id
 
     def initialize(project, email_template_id)
@@ -22,7 +24,7 @@ module Txbr
     end
 
     def templates
-      %w(body subject preheader).each_with_object([]) do |name, ret|
+      TEMPLATE_KEYS.each_with_object([]) do |name, ret|
         begin
           liquid_tmpl = ::Liquid::Template.parse(details[name])
           ret << Txbr::Template.new(email_template_id, liquid_tmpl)
