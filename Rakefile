@@ -75,6 +75,8 @@ namespace :publish do
     task_names = %w(
       version:bump version:history version:commit_and_push
       publish:tag publish:build_gem publish:publish_gem
+      publish:update_docker_base_image publish:build_docker
+      publish:publish_docker
     )
 
     task_names.each do |task_name|
@@ -101,6 +103,25 @@ namespace :publish do
 
   task :publish_gem do
     system("gem push pkg/txbr-#{Txbr::VERSION}.gem")
+  end
+
+  task :update_docker_base_image do
+    system("docker pull ruby:2.5")
+  end
+
+  task :build_docker do
+    require './lib/txbr/version'
+    version = Txbr::VERSION
+
+    system("docker build -t #{DOCKER_REPO}:latest -t #{DOCKER_REPO}:v#{version} .")
+  end
+
+  task :publish_docker do
+    require './lib/txbr/version'
+    version = Txbr::VERSION
+
+    system("docker push #{DOCKER_REPO}:latest")
+    system("docker push #{DOCKER_REPO}:v#{version}")
   end
 end
 
