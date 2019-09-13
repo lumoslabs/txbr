@@ -1,3 +1,6 @@
+# 2.3.0
+* Add support for the special Braze {% abort_message(...) %} tag.
+
 # 2.2.0
 * Also extract strings from email templates attached to campaigns.
 

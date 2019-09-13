@@ -17,6 +17,9 @@ describe Txbr::EmailTemplate do
           {% assign translation_enabled = true %}
           {% connected_content http://my_strings_api.com?project_slug={{project_slug}}&resource_slug={{resource_slug}} :save strings %}
           {% connected_content http://my_strings_api.com?project_slug=my_project&resource_slug=my_footer_resource :save footer %}
+          {% if strings.__http_status_code__ != 200 %}
+            {% abort_message("Error fetching translations") %}
+          {% endif %}
         </head>
         <body>
           {{strings.header | default: 'Buy our stuff!'}}

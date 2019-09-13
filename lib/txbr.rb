@@ -64,4 +64,5 @@ module Txbr
   Txbr.register_handler('campaigns', Txbr::CampaignHandler)
 
   ::Liquid::Template.register_tag(:connected_content, Txbr::Liquid::ConnectedContentTag)
+  ::Liquid::Template.register_tag(:abort_message, Txbr::Liquid::AbortMessageTag)
 end
