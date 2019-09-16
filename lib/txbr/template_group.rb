@@ -19,7 +19,7 @@ module Txbr
             manifest.merge(content_tag.strings_manifest)
           end
 
-          yield to_resource(metadata, strings)
+          yield to_resource(metadata, strings) unless strings.empty?
         end
     end
 

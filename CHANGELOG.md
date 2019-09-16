@@ -1,3 +1,7 @@
+# 2.4.1
+* Don't process connected_content tags that appear to contain no translations.
+* Avoid uploading empty resources.
+
 # 2.4.0
 * Include metadata when reporting errors that occur while parsing templates.
 

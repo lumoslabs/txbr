@@ -38,8 +38,9 @@ module Txbr
     end
 
     def content_tags
-      @content_tags ||= connected_content_tags.map do |tag|
-        ContentTag.new(liquid_template, tag)
+      @content_tags ||= connected_content_tags.each_with_object([]) do |tag, ret|
+        tag = ContentTag.new(liquid_template, tag)
+        ret << tag if tag.contains_translations?
       end
     end
 

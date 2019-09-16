@@ -38,6 +38,10 @@ module Txbr
 
     alias each_string each
 
+    def empty?
+      @strings.empty?
+    end
+
     private
 
     def each_helper(root, path, &block)

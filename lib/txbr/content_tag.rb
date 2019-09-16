@@ -25,6 +25,10 @@ module Txbr
       end
     end
 
+    def contains_translations?
+      metadata.project_slug && metadata.resource_slug && metadata.prefix
+    end
+
     private
 
     def extract_strings_from(root, manifest)

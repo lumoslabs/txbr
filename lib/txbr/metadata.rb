@@ -5,9 +5,9 @@ module Txbr
     attr_reader :project_slug, :resource_slug, :prefix
 
     def initialize(options = {})
-      @project_slug = options.fetch('project_slug')
-      @resource_slug = options.fetch('resource_slug')
-      @prefix = options.fetch('prefix')
+      @project_slug = options['project_slug']
+      @resource_slug = options['resource_slug']
+      @prefix = options['prefix']
     end
 
     def ==(other)
