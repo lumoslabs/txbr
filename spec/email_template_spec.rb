@@ -54,26 +54,26 @@ describe Txbr::EmailTemplate do
     HTML
   end
 
-  describe '#each_resource' do
-    let(:braze_interactions) do
-      [{
-        request: {
-          verb: 'get',
-          url: Txbr::EmailTemplatesApi::TEMPLATE_DETAILS_PATH,
-          params: { email_template_id: email_template_id }
-        },
-        response: {
-          status: 200,
-          body: {
-            template_name: 'Super Slick Awesome',
-            body: body_html,
-            subject: subject_html,
-            preheader: preheader_html
-          }.to_json
-        }
-      }]
-    end
+  let(:braze_interactions) do
+    [{
+      request: {
+        verb: 'get',
+        url: Txbr::EmailTemplatesApi::TEMPLATE_DETAILS_PATH,
+        params: { email_template_id: email_template_id }
+      },
+      response: {
+        status: 200,
+        body: {
+          template_name: 'Super Slick Awesome',
+          body: body_html,
+          subject: subject_html,
+          preheader: preheader_html
+        }.to_json
+      }
+    }]
+  end
 
+  describe '#each_resource' do
     it 'extracts and groups all strings with the same project, resource, and prefix' do
       resource = email_template.each_resource.to_a.first
       expect(resource.tx_resource.project_slug).to eq('my_project')
@@ -150,6 +150,40 @@ describe Txbr::EmailTemplate do
         expect(resources.last.tx_resource.project_slug).to eq('my_project')
         expect(resources.last.tx_resource.resource_slug).to eq('my_other_resource')
       end
+    end
+
+    context 'when an error occurs' do
+      before do
+        allow(::Liquid::Template).to receive(:parse).and_raise('jelly beans')
+      end
+
+      it 'passes item metadata to the error handler' do
+        errors = []
+
+        Txgh.events.subscribe('errors') do |e, params|
+          errors << [e, params]
+        end
+
+        expect { email_template.each_resource.to_a }.to change { errors.size }.by_at_least(1)
+
+        email_template.class::TEMPLATE_KEYS.each do |key|
+          idx = errors.index { |(_err, params)| params[:template_key] == key }
+          expect(errors[idx][1]).to eq(email_template.metadata.merge(template_key: key))
+          errors.delete_at(idx)
+        end
+
+        expect(errors).to be_empty
+      end
+    end
+  end
+
+  describe '#metadata' do
+    it 'includes the correct values' do
+      expect(email_template.metadata).to eq(
+        item_type: 'email_template',
+        template_name: 'Super Slick Awesome',
+        template_id: email_template_id
+      )
     end
   end
 end

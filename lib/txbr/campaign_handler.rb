@@ -11,8 +11,6 @@ module Txbr
       each_campaign { |campaign| campaign.each_resource(&block) }
     end
 
-    private
-
     def each_campaign
       return to_enum(__method__) unless block_given?
 
@@ -20,5 +18,7 @@ module Txbr
         yield Campaign.new(project, campaign['id'])
       end
     end
+
+    alias_method :each_item, :each_campaign
   end
 end

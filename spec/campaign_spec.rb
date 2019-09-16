@@ -36,27 +36,27 @@ describe Txbr::Campaign do
     HTML
   end
 
-  describe '#each_resource' do
-    let(:braze_interactions) do
-      [{
-        request: {
-          verb: 'get',
-          url: Txbr::CampaignsApi::CAMPAIGN_DETAILS_PATH,
-          params: { campaign_id: campaign_id }
-        },
-        response: {
-          status: 200,
-          body: {
-            name: 'World Domination',
-            messages: {
-              abc123: { name: 'Subliminal Messaging', message: first_message },
-              def456: { name: 'Propaganda', message: second_message }
-            }
-          }.to_json
-        }
-      }]
-    end
+  let(:braze_interactions) do
+    [{
+      request: {
+        verb: 'get',
+        url: Txbr::CampaignsApi::CAMPAIGN_DETAILS_PATH,
+        params: { campaign_id: campaign_id }
+      },
+      response: {
+        status: 200,
+        body: {
+          name: 'World Domination',
+          messages: {
+            abc123: { name: 'Subliminal Messaging', message: first_message },
+            def456: { name: 'Propaganda', message: second_message }
+          }
+        }.to_json
+      }
+    }]
+  end
 
+  describe '#each_resource' do
     it 'extracts and groups all strings with the same project, resource, and prefix' do
       resource = campaign.each_resource.to_a.first
       expect(resource.tx_resource.project_slug).to eq('my_project')
@@ -131,6 +131,36 @@ describe Txbr::Campaign do
         expect(resources.first.tx_resource.project_slug).to eq('my_project')
         expect(resources.first.tx_resource.resource_slug).to eq('my_other_resource')
       end
+    end
+
+    context 'when an error occurs' do
+      before do
+        allow(::Liquid::Template).to receive(:parse).and_raise('jelly beans')
+      end
+
+      it 'passes item metadata to the error handler' do
+        errors = []
+
+        Txgh.events.subscribe('errors') do |e, params|
+          errors << [e, params]
+        end
+
+        expect { campaign.each_resource.to_a }.to change { errors.size }.by_at_least(1)
+
+        errors.each do |(_error, params)|
+          expect(params).to eq(campaign.metadata.merge(template_key: 'message'))
+        end
+      end
+    end
+  end
+
+  describe '#metadata' do
+    it 'includes the correct values' do
+      expect(campaign.metadata).to eq(
+        item_type: 'campaign',
+        campaign_name: 'World Domination',
+        campaign_id: campaign_id
+      )
     end
   end
 end

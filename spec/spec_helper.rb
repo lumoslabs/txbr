@@ -11,4 +11,9 @@ require 'support/env_helpers'
 
 RSpec.configure do |config|
   config.include(EnvHelpers)
+
+  config.after(:each) do
+    # clear out event handlers
+    Txgh.events.channel_hash.clear
+  end
 end

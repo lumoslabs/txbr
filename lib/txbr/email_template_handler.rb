@@ -14,8 +14,6 @@ module Txbr
       end
     end
 
-    private
-
     def each_template
       return to_enum(__method__) unless block_given?
 
@@ -23,5 +21,7 @@ module Txbr
         yield EmailTemplate.new(project, tmpl['email_template_id'])
       end
     end
+
+    alias_method :each_item, :each_template
   end
 end

@@ -3,6 +3,7 @@ require 'txgh'
 
 module Txbr
   class EmailTemplate
+    ITEM_TYPE = 'email_template'.freeze
     TEMPLATE_KEYS = %w(body subject preheader).freeze
 
     attr_reader :project, :email_template_id
@@ -17,6 +18,16 @@ module Txbr
       template_group.each_resource(&block)
     end
 
+    def metadata
+      @metadata ||= {
+        item_type: ITEM_TYPE,
+        template_name: template_name,
+        template_id: email_template_id
+      }
+    rescue => e
+      {}
+    end
+
     private
 
     def template_group
@@ -28,8 +39,8 @@ module Txbr
         begin
           liquid_tmpl = ::Liquid::Template.parse(details[name])
           ret << Txbr::Template.new(email_template_id, liquid_tmpl)
-        rescue ::Liquid::SyntaxError => e
-          Txgh.events.publish_error!(e)
+        rescue => e
+          Txgh.events.publish_error!(e, metadata.merge(template_key: name))
         end
       end
     end
