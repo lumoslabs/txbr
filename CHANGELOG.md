@@ -1,5 +1,5 @@
 # 2.4.0
-* Include metadata when reporting errors that occur while parsing and uploading template strings.
+* Include metadata when reporting errors that occur while parsing templates.
 
 # 2.3.0
 * Add support for the special Braze {% abort_message(...) %} tag.
