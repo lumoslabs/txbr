@@ -135,7 +135,7 @@ Txbr requires an Internet connection to access the Transifex and Braze APIs.
 Compatibility
 ---
 
-Txdb requires Ruby 2.5.
+Txbr requires Ruby 2.5.
 
 Authors
 ---
