@@ -2,9 +2,12 @@ module Txbr
   class Template
     attr_reader :id, :liquid_template
 
-    def initialize(id, liquid_template)
+    def initialize(id, source, prerender_variables = {})
       @id = id
-      @liquid_template = liquid_template
+
+      @liquid_template = ::Liquid::Template.parse(
+        prerender(source, prerender_variables)
+      )
     end
 
     def each_content_tag
@@ -14,6 +17,14 @@ module Txbr
         next unless translation_enabled?
         yield content_tag
       end
+    end
+
+    def render
+      liquid_template.render
+    end
+
+    def root
+      liquid_template.root
     end
 
     private
@@ -39,7 +50,7 @@ module Txbr
 
     def content_tags
       @content_tags ||= connected_content_tags.each_with_object([]) do |tag, ret|
-        tag = ContentTag.new(liquid_template, tag)
+        tag = ContentTag.new(self, tag)
         ret << tag if tag.contains_translations?
       end
     end
@@ -50,6 +61,22 @@ module Txbr
       @connected_content_tags ||= liquid_template.root.nodelist.select do |node|
         node.is_a?(Txbr::Liquid::ConnectedContentTag)
       end
+    end
+
+    # Designed to replace special Braze variables like {{campaign.${api_id}}},
+    # which Liquid can't natively handle. If the variable exists in the given
+    # variables hash, replace it with the value directly. Otherwise, transform
+    # the var into something Liquid-friendly so it doesn't jam up the parser.
+    def prerender(source, variables)
+      source.gsub(/\{\{[\w\-\.\[\]]+\.\$\{[\w\-\.\[\]]+\}\}\}/) do |orig|
+        orig = orig[2..-3]  # remove curlies
+        next variables[orig] if variables.include?(orig)
+        "{{#{normalize_braze_var(orig)}}}"
+      end
+    end
+
+    def normalize_braze_var(var)
+      "__braze__#{var.gsub(/[^\w\-\.\[\]]/, '')}"
     end
   end
 end

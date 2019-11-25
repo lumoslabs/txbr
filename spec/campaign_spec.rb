@@ -10,28 +10,26 @@ describe Txbr::Campaign do
 
   let(:first_message) do
     <<~MESSAGE
-        {% assign project_slug = "my_project" %}
-        {% assign resource_slug = "my_resource" %}
-        {% assign translation_enabled = true %}
-        {% connected_content http://my_strings_api.com?project_slug={{project_slug}}&resource_slug={{resource_slug}} :save strings %}
-        {% connected_content http://my_strings_api.com?project_slug=my_project&resource_slug=my_footer_resource :save footer %}
+      {% assign project_slug = "my_project" %}
+      {% assign translation_enabled = true %}
+      {% connected_content http://my_strings_api.com?project_slug={{project_slug}}&resource_slug={{campaign.${api_id}}} :save strings %}
+      {% connected_content http://my_strings_api.com?project_slug=my_project&resource_slug=my_footer_resource :save footer %}
 
-        {{strings.header | default: 'Buy our stuff!'}}
-        {% if user.gets_discount? %}
-          {{strings.discount | default: 'You get a discount'}}
-        {% else %}
-          {{strings.no_discount | default: 'You get no discount'}}
-        {% endif %}
-        {{footer.company | default: 'Megamarketing Corp'}}
+      {{strings.header | default: 'Buy our stuff!'}}
+      {% if user.gets_discount? %}
+        {{strings.discount | default: 'You get a discount'}}
+      {% else %}
+        {{strings.no_discount | default: 'You get no discount'}}
+      {% endif %}
+      {{footer.company | default: 'Megamarketing Corp'}}
     MESSAGE
   end
 
   let(:second_message) do
     <<~HTML
       {% assign project_slug = "my_project" %}
-      {% assign resource_slug = "my_resource" %}
       {% assign translation_enabled = true %}
-      {% connected_content http://my_strings_api.com?project_slug={{project_slug}}&resource_slug={{resource_slug}} :save strings %}
+      {% connected_content http://my_strings_api.com?project_slug={{project_slug}}&resource_slug={{campaign.${api_id}}} :save strings %}
       {{strings.meta.subject_line | default: 'You lucky duck maybe'}}
     HTML
   end
@@ -60,7 +58,7 @@ describe Txbr::Campaign do
     it 'extracts and groups all strings with the same project, resource, and prefix' do
       resource = campaign.each_resource.to_a.first
       expect(resource.tx_resource.project_slug).to eq('my_project')
-      expect(resource.tx_resource.resource_slug).to eq('my_resource')
+      expect(resource.tx_resource.resource_slug).to eq(campaign_id)
 
       # notice how it combined strings from both messages,
       expect(resource.phrases).to eq([
@@ -76,7 +74,7 @@ describe Txbr::Campaign do
       tx_resource = resource.tx_resource
 
       expect(tx_resource.project_slug).to eq('my_project')
-      expect(tx_resource.resource_slug).to eq('my_resource')
+      expect(tx_resource.resource_slug).to eq(campaign_id)
       expect(tx_resource.source_file).to eq('World Domination')
       expect(tx_resource.source_lang).to eq(project.source_lang)
       expect(tx_resource.type).to eq(project.strings_format)
@@ -107,29 +105,26 @@ describe Txbr::Campaign do
     end
 
     context 'when the message comes from a separate resource' do
-      let(:first_message) do
-        super().tap do |subj|
-          subj.sub!(
-            'resource_slug = "my_resource"',
-            'resource_slug = "my_other_resource"'
-          )
-        end
-      end
-
       it 'includes the additional resource' do
         resources = campaign.each_resource.to_a
-        expect(resources.size).to eq(3)
+        expect(resources.size).to eq(2)
 
         expect(resources.first.phrases).to_not(
-          include({ 'key' => 'meta.subject_line', 'string' => 'You lucky duck maybe' })
+          include({ 'key' => 'company', 'string' => 'Megamarketing Corp' })
         )
 
-        expect(resources.last.phrases).to eq(
-          [{ 'key' => 'meta.subject_line', 'string' => 'You lucky duck maybe' }]
+        expect(resources.last.phrases).to(
+          include({ 'key' => 'company', 'string' => 'Megamarketing Corp' })
         )
 
-        expect(resources.first.tx_resource.project_slug).to eq('my_project')
-        expect(resources.first.tx_resource.resource_slug).to eq('my_other_resource')
+        first = resources.first.tx_resource
+        second = resources.last.tx_resource
+
+        expect(first.project_slug).to eq('my_project')
+        expect(first.resource_slug).to eq(campaign_id)
+
+        expect(second.project_slug).to eq('my_project')
+        expect(second.resource_slug).to eq('my_footer_resource')
       end
     end
 
