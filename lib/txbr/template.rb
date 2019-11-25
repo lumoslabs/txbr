@@ -63,12 +63,13 @@ module Txbr
       end
     end
 
-    # Designed to replace special Braze variables like {{campaign.${api_id}}},
-    # which Liquid can't natively handle. If the variable exists in the given
-    # variables hash, replace it with the value directly. Otherwise, transform
-    # the var into something Liquid-friendly so it doesn't jam up the parser.
+    # Designed to replace special Braze variables like {{campaign.${api_id}}}
+    # and ${first_name}, which Liquid can't natively handle. If the variable
+    # exists in the given variables hash, replace it with the value directly.
+    # Otherwise, transform the var into something Liquid-friendly so it
+    # doesn't jam up the parser.
     def prerender(source, variables)
-      source.gsub(/\{\{[\w\-\.\[\]]+\.\$\{[\w\-\.\[\]]+\}\}\}/) do |orig|
+      source.gsub(/\{\{\s*(?:[\w\-\.\[\]]+\.)?\$\{\s*[\w\-\.\[\]]+\s*\}\s*\}\s*\}/) do |orig|
         orig = orig[2..-3]  # remove curlies
         next variables[orig] if variables.include?(orig)
         "{{#{normalize_braze_var(orig)}}}"

@@ -8,14 +8,23 @@ describe Txbr::Template do
   let(:source) do
     <<~SRC
       <h1>Braze campaign is {{campaign.${api_id}}}</h1>
+      <h2>Hello, {{${first_name}}}</h2>
     SRC
   end
 
   context 'with a direct variable replacement' do
-    let(:prerender_variables) { { 'campaign.${api_id}' => 'abc123' } }
+    let(:prerender_variables) do
+      {
+        'campaign.${api_id}' => 'abc123',
+        '${first_name}' => 'Dwight'
+      }
+    end
 
     it 'prerenders correctly' do
-      expect(subject.render.strip).to eq("<h1>Braze campaign is abc123</h1>")
+      expect(subject.render).to eq(<<~TEXT)
+        <h1>Braze campaign is abc123</h1>
+        <h2>Hello, Dwight</h2>
+      TEXT
     end
   end
 

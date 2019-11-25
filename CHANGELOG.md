@@ -1,3 +1,6 @@
+# 2.5.1
+* Also support special Braze variables of the form ${first_name}.
+
 # 2.5.0
 * Support campaign.${api_id} variable in connected content URLs.
 * Fix issue parsing templates with special Braze variables (like the one mentioned above).
