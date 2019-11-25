@@ -105,30 +105,26 @@ describe Txbr::Campaign do
     end
 
     context 'when the message comes from a separate resource' do
-      let(:first_message) do
-        super().tap do |subj|
-          subj.sub!(
-            'resource_slug = "my_resource"',
-            'resource_slug = "my_other_resource"'
-          )
-        end
-      end
-
       it 'includes the additional resource' do
         resources = campaign.each_resource.to_a
-        binding.pry
-        expect(resources.size).to eq(3)
+        expect(resources.size).to eq(2)
 
         expect(resources.first.phrases).to_not(
-          include({ 'key' => 'meta.subject_line', 'string' => 'You lucky duck maybe' })
+          include({ 'key' => 'company', 'string' => 'Megamarketing Corp' })
         )
 
-        expect(resources.last.phrases).to eq(
-          [{ 'key' => 'meta.subject_line', 'string' => 'You lucky duck maybe' }]
+        expect(resources.last.phrases).to(
+          include({ 'key' => 'company', 'string' => 'Megamarketing Corp' })
         )
 
-        expect(resources.first.tx_resource.project_slug).to eq('my_project')
-        expect(resources.first.tx_resource.resource_slug).to eq('my_other_resource')
+        first = resources.first.tx_resource
+        second = resources.last.tx_resource
+
+        expect(first.project_slug).to eq('my_project')
+        expect(first.resource_slug).to eq(campaign_id)
+
+        expect(second.project_slug).to eq('my_project')
+        expect(second.resource_slug).to eq('my_footer_resource')
       end
     end
 

@@ -37,8 +37,7 @@ module Txbr
     def templates
       TEMPLATE_KEYS.each_with_object([]) do |name, ret|
         begin
-          liquid_tmpl = ::Liquid::Template.parse(details[name])
-          ret << Txbr::Template.new(email_template_id, liquid_tmpl)
+          ret << Txbr::Template.new(email_template_id, details[name])
         rescue => e
           Txgh.events.publish_error!(e, metadata.merge(template_key: name))
         end
