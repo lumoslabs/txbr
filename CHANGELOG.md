@@ -1,3 +1,7 @@
+# 2.5.0
+* Support campaign.${api_id} variable in connected content URLs.
+* Fix issue parsing templates with special Braze variables (like the one mentioned above).
+
 # 2.4.1
 * Don't process connected_content tags that appear to contain no translations.
 * Avoid uploading empty resources.
