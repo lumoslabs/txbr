@@ -27,6 +27,12 @@ module Txbr
       {}
     end
 
+    def prerender_variables
+      @prerender_variables ||= {
+        'campaign.${api_id}' => campaign_id
+      }
+    end
+
     private
 
     def template_group
@@ -38,7 +44,9 @@ module Txbr
         TEMPLATE_KEYS.each_with_object([]) do |key, ret|
           begin
             if message = props[key]
-              ret << Txbr::Template.new(message_id, ::Liquid::Template.parse(message))
+              ret << Txbr::Template.new(
+                message_id, message, prerender_variables
+              )
             end
           rescue => e
             Txgh.events.publish_error!(e, metadata.merge(template_key: key))

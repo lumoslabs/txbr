@@ -23,21 +23,12 @@ module Txbr
       # template might contain {{strings.bar}}, which would print
       # out "baz".
       PARSE_RE = /(:#{IDENTIFIER})\s+(#{IDENTIFIER})/
-      ASSIGNS_RE = /\{\{(?:(?!\}\}).)*\}\}/
 
       attr_reader :tag_name, :url, :arguments
 
-      def initialize(tag_name, arg, _context = nil)
+      def initialize(tag_name, arg, _parse_context = nil)
         @tag_name = tag_name
         @url, @arguments = parse_arg(arg)
-      end
-
-      # this method is called inside Txbr::ContentTag#metadata
-      def render(context)
-        @metadata_hash =
-          Metadata::ASSIGNMENTS.each_with_object({}) do |assignment, ret|
-            ret[assignment] = context[assignment]
-          end
       end
 
       def prefix
@@ -45,28 +36,22 @@ module Txbr
         arguments.fetch('save').first
       end
 
-      def metadata
-        @metadata ||= begin
-          query_hash = CGI.parse(uri.query)
+      def render(context)
+        @url = ::Liquid::Template.parse(url).render(context)
+        ''
+      end
 
-          Metadata.new(
-            query_hash
-              .each_with_object({}) { |(k, v), ret| ret[k] = v.first }
-              .merge('prefix' => prefix)
-          )
-        end
+      def metadata
+        uri = URI.parse(url)
+
+        Metadata.new(
+          CGI.parse(uri.query)
+            .each_with_object({}) { |(k, v), ret| ret[k] = v.first }
+            .merge('prefix' => prefix)
+        )
       end
 
       private
-
-      def uri
-        @uri ||= URI.parse(
-          url.gsub(ASSIGNS_RE) do |assign|
-            # remove curlies from beginning and end, look up in assigns hash
-            @metadata_hash[assign.gsub(/\A\{\{|\}\}\z/, '')]
-          end
-        )
-      end
 
       def parse_arg(arg)
         url, *components = arg.split(PARSE_RE)

@@ -1,9 +1,13 @@
+require 'liquid'
+require 'cgi'
+require 'uri'
+
 module Txbr
   class ContentTag
-    attr_reader :liquid_template, :liquid_tag
+    attr_reader :template, :liquid_tag
 
-    def initialize(liquid_template, liquid_tag)
-      @liquid_template = liquid_template
+    def initialize(template, liquid_tag)
+      @template = template
       @liquid_tag = liquid_tag
     end
 
@@ -14,14 +18,14 @@ module Txbr
         # set local variables for the project and resource slugs. It's less
         # error-prone to let Liquid do the template evaluation instead of
         # grepping through the nodelist looking for assignment statements.
-        liquid_template.render
+        template.render
         liquid_tag.metadata
       end
     end
 
     def strings_manifest
       @strings_manifest ||= StringsManifest.new.tap do |manifest|
-        extract_strings_from(liquid_template.root, manifest)
+        extract_strings_from(template.root, manifest)
       end
     end
 
