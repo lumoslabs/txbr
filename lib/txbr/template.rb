@@ -69,10 +69,24 @@ module Txbr
     # Otherwise, transform the var into something Liquid-friendly so it
     # doesn't jam up the parser.
     def prerender(source, variables)
-      source.gsub(/\{\{\s*(?:[\w\-\.\[\]]+\.)?\$\{\s*[\w\-\.\[\]]+\s*\}\s*\}\s*\}/) do |orig|
-        orig = orig[2..-3]  # remove curlies
-        next variables[orig] if variables.include?(orig)
-        "{{#{normalize_braze_var(orig)}}}"
+      source.gsub(/\{\s*\{\s*(?:[\w\-\_\.\[\]]+\.)?\$\{\s*[\w\-\.\[\]]+\s*\}?\s*\}?\s*\}?/) do |orig|
+        plain = orig.sub(/\A\{\{/, '').sub(/\}\}\z/, '')
+
+        result = if val = variables[plain]
+          "\"#{val}\""
+        else
+          normalize_braze_var(orig)
+        end
+
+        if orig.tr(' ', '').start_with?('{{')
+          result = "{{#{result}"
+        end
+
+        if orig.tr(' ', '').end_with?('}}')
+          result << '}}'
+        end
+
+        result
       end
     end
 

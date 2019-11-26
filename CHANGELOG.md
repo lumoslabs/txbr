@@ -1,3 +1,6 @@
+# 2.5.2
+* Also support special Braze variables that don't have ending curlies (i.e. they are followed by filters).
+
 # 2.5.1
 * Also support special Braze variables of the form ${first_name}.
 
