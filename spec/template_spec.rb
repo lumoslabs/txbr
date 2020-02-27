@@ -10,6 +10,7 @@ describe Txbr::Template do
       <h1>Braze campaign is {{campaign.${api_id}}}</h1>
       <h2>Hello, {{${first_name}}}</h2>
       <h3>I speak {{custom_attributes.${preferred_language} | default: 'en'}}</h3>
+      <h3>{{'foo bar ' | append: custom_attributes.${foobar}}}</h3>
     SRC
   end
 
@@ -17,7 +18,8 @@ describe Txbr::Template do
     let(:prerender_variables) do
       {
         'campaign.${api_id}' => 'abc123',
-        '${first_name}' => 'Dwight'
+        '${first_name}' => 'Dwight',
+        'custom_attributes.${foobar}' => 'baz'
       }
     end
 
@@ -26,6 +28,7 @@ describe Txbr::Template do
         <h1>Braze campaign is abc123</h1>
         <h2>Hello, Dwight</h2>
         <h3>I speak en</h3>
+        <h3>foo bar baz</h3>
       TEXT
     end
   end
@@ -36,6 +39,7 @@ describe Txbr::Template do
         <h1>Braze campaign is </h1>
         <h2>Hello, </h2>
         <h3>I speak en</h3>
+        <h3>foo bar </h3>
       TEXT
     end
   end

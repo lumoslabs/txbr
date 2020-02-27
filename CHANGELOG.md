@@ -1,3 +1,6 @@
+# 2.5.3
+* Fix support for special Braze variables that don't begin with double curlies.
+
 # 2.5.2
 * Also support special Braze variables that don't have ending curlies (i.e. they are followed by filters).
 

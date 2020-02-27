@@ -69,7 +69,7 @@ module Txbr
     # Otherwise, transform the var into something Liquid-friendly so it
     # doesn't jam up the parser.
     def prerender(source, variables)
-      source.gsub(/\{\s*\{\s*(?:[\w\-\_\.\[\]]+\.)?\$\{\s*[\w\-\.\[\]]+\s*\}?\s*\}?\s*\}?/) do |orig|
+      source.gsub(/(?:\{\s*\{\s*)?(?:[\w\-\_\.\[\]]+\.)?\$\{\s*[\w\-\.\[\]]+\s*\}?\s*(?:\}?\s*\})?/) do |orig|
         plain = orig.sub(/\A\{\{/, '').sub(/\}\}\z/, '')
 
         result = if val = variables[plain]
