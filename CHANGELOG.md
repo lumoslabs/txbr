@@ -1,3 +1,6 @@
+# 2.6.0
+* Update `txgh` to v7.0.0.
+
 # 2.5.3
 * Fix support for special Braze variables that don't begin with double curlies.
 
