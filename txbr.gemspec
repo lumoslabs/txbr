@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'liquid', '~> 4.0'
   s.add_dependency 'sinatra', '~> 1.4'
   s.add_dependency 'sinatra-contrib', '~> 1.4'
-  s.add_dependency 'txgh', '~> 6.6'
+  s.add_dependency 'txgh', '~> 7.0'
 
   s.require_path = 'lib'
   s.files = Dir['{lib,spec}/**/*', 'README.md', 'txbr.gemspec', 'LICENSE']
