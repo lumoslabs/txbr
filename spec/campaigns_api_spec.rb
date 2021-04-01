@@ -20,13 +20,13 @@ describe Txbr::CampaignsApi do
 
     let(:interactions) do
       [{
-        request: { verb: 'get', url: described_class::CAMPAIGN_LIST_PATH, params: { page: 0 } },
+        request: { verb: 'get', url: described_class::CAMPAIGN_LIST_PATH, params: { page: 0, include_archived: false } },
         response: { status: 200, body: { campaigns: [{ id: '123abc' }] }.to_json }
       }, {
-        request: { verb: 'get', url: described_class::CAMPAIGN_LIST_PATH, params: { page: 1 } },
+        request: { verb: 'get', url: described_class::CAMPAIGN_LIST_PATH, params: { page: 1, include_archived: false } },
         response: { status: 200, body: { campaigns: [{ id: '456def' }] }.to_json }
       }, {
-        request: { verb: 'get', url: described_class::CAMPAIGN_LIST_PATH, params: { page: 2 } },
+        request: { verb: 'get', url: described_class::CAMPAIGN_LIST_PATH, params: { page: 2, include_archived: false } },
         response: { status: 200, body: { campaigns: [] }.to_json }
       }]
     end

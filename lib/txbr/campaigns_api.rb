@@ -15,7 +15,7 @@ module Txbr
       page = 0
 
       loop do
-        campaigns = braze_api.get_json(CAMPAIGN_LIST_PATH, page: page)
+        campaigns = braze_api.get_json(CAMPAIGN_LIST_PATH, page: page, include_archived: false)
         campaigns['campaigns'].each(&block)
         break if campaigns['campaigns'].size < CAMPAIGN_BATCH_SIZE
         page += 1
