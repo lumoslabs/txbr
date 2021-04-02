@@ -1,3 +1,6 @@
+# 2.6.1
+* Exclude archived campaigns from Braze with "include_archived: false" parameter.
+
 # 2.6.0
 * Update `txgh` to v7.0.0.
 
