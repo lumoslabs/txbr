@@ -6,7 +6,9 @@ describe Txbr::Campaign do
   include_context 'standard setup'
 
   let(:campaign_id) { 'abc123' }
-  let(:campaign) { described_class.new(project, campaign_id) }
+  let(:last_edited) { '2021-03-18T16:20:57+00:00' }
+  let(:campaign_data) { Hash['id', campaign_id, 'last_edited', last_edited] }
+  let(:campaign) { described_class.new(project, campaign_data) }
 
   let(:first_message) do
     <<~MESSAGE
@@ -154,7 +156,8 @@ describe Txbr::Campaign do
       expect(campaign.metadata).to eq(
         item_type: 'campaign',
         campaign_name: 'World Domination',
-        campaign_id: campaign_id
+        campaign_id: campaign_id,
+        last_edited: last_edited
       )
     end
   end
