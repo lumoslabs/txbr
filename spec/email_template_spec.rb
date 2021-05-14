@@ -6,7 +6,9 @@ describe Txbr::EmailTemplate do
   include_context 'standard setup'
 
   let(:email_template_id) { 'abc123' }
-  let(:email_template) { described_class.new(project, email_template_id) }
+  let(:last_edited) { '2021-03-18T16:20:57+00:00' }
+  let(:tmpl_data) { Hash['email_template_id', email_template_id, 'updated_at', last_edited] }
+  let(:email_template) { described_class.new(project, tmpl_data) }
 
   let(:body_html) do
     <<~HTML
@@ -182,7 +184,8 @@ describe Txbr::EmailTemplate do
       expect(email_template.metadata).to eq(
         item_type: 'email_template',
         template_name: 'Super Slick Awesome',
-        template_id: email_template_id
+        template_id: email_template_id,
+        last_edited: last_edited
       )
     end
   end

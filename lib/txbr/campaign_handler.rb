@@ -14,8 +14,8 @@ module Txbr
     def each_campaign
       return to_enum(__method__) unless block_given?
 
-      project.braze_api.campaigns.each do |campaign|
-        yield Campaign.new(project, campaign['id'])
+      project.braze_api.campaigns.each do |campaign_data|
+        yield Campaign.new(project, campaign_data)
       end
     end
 

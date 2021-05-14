@@ -7,9 +7,10 @@ module Txbr
 
     attr_reader :project, :campaign_id
 
-    def initialize(project, campaign_id)
+    def initialize(project, campaign_data)
       @project = project
-      @campaign_id = campaign_id
+      @campaign_data = campaign_data
+      @campaign_id = campaign_data['id']
     end
 
     def each_resource(&block)
@@ -21,7 +22,8 @@ module Txbr
       @metadata ||= {
         item_type: ITEM_TYPE,
         campaign_name: campaign_name,
-        campaign_id: campaign_id
+        campaign_id: campaign_id,
+        last_edited: last_edited
       }
     rescue => e
       {}
@@ -34,6 +36,12 @@ module Txbr
     end
 
     private
+
+    attr_reader :campaign_data
+
+    def last_edited
+      campaign_data['last_edited']
+    end
 
     def template_group
       @template_group ||= TemplateGroup.new(campaign_name, templates, project)

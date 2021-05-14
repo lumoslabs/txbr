@@ -8,9 +8,10 @@ module Txbr
 
     attr_reader :project, :email_template_id
 
-    def initialize(project, email_template_id)
+    def initialize(project, tmpl_data)
       @project = project
-      @email_template_id = email_template_id
+      @tmpl_data = tmpl_data
+      @email_template_id = tmpl_data['email_template_id']
     end
 
     def each_resource(&block)
@@ -22,13 +23,20 @@ module Txbr
       @metadata ||= {
         item_type: ITEM_TYPE,
         template_name: template_name,
-        template_id: email_template_id
+        template_id: email_template_id,
+        last_edited: last_edited
       }
     rescue => e
       {}
     end
 
     private
+
+    attr_reader :tmpl_data
+
+    def last_edited
+      tmpl_data['updated_at']
+    end
 
     def template_group
       @template_group ||= TemplateGroup.new(template_name, templates, project)

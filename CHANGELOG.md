@@ -1,3 +1,8 @@
+# 2.7.0
+* Add last_edited as last_edited to campaign instance metadata
+* add updated_at as last_edited to email template instance metadata
+* Change initializer for Txbr::Campaign and Txbr::EmailTemplate
+
 # 2.6.1
 * Exclude archived campaigns from Braze with "include_archived: false" parameter.
 
